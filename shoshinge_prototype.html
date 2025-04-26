@@ -5,13 +5,23 @@
   <meta charset="UTF-8">
   <title>正信偈プロトタイプ</title>
 
-  
+
   <style>
     /* 全体レイアウト --------------------------------------------------- */
     body {
       font-family: "Hiragino Mincho ProN", serif;
       margin: 0;
       padding: 20px;
+    }
+
+    #player-wrapper {
+      writing-mode: horizontal-tb;
+      margin-bottom: 20px
+    }
+
+    #text-wrapper {
+      writing-mode: vertical-rl;
+      text-orientation: upright
     }
 
     #player-wrapper {
@@ -30,6 +40,7 @@
       line-height: 1;
       position: relative;
       margin-right: 12px;
+      cursor: pointer;
     }
 
     .body {
@@ -50,17 +61,23 @@
 
 <body>
 
-  <!-- Ⓐ オーディオ --------------------------------------------------- -->
+  <!-- ◇ オーディオ１本 + 曲セレクタ -->
   <div id="player-wrapper">
-    <audio id="audio" controls src="audio/shoshinge.mp3"></audio>
+    再生するお経：
+    <select id="chantSel">
+      <option value="shoshinge" selected>正信偈</option>
+      <option value="wasan">念仏和讃</option>
+    </select><br>
+    <audio id="audio" controls></audio>
   </div>
 
-  <!-- Ⓑ テキスト（正信偈・念仏和讃・回向句） ----------------------- -->
+  <!-- ◇ テキスト２本 -->
   <div id="text-wrapper">
 
+
     <!-- ■■■ 正信念仏偈 ■■■ -->
-    <section>
-      <h2>正信念仏偈</h2>
+    <section id="shoshinge" class="chant-block">
+      <h2>正信偈</h2>
       <div class="verse" data-start="7.1" data-end="21.9">帰命無量寿如来</div>
       <div class="verse" data-start="21.9" data-end="30.9">南無不可思議光</div>
       <div class="verse" data-start="30.9" data-end="38.7">法蔵菩薩因位時</div>
@@ -184,117 +201,136 @@
     </section>
 
     <!-- ■■■ 念仏和讃（タイムスタンプなし / バーは常時 0%） ■■■ -->
-    <section>
+    <section id="wasan" class="chant-block" hidden>
       <h2>念仏和讃</h2>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南</div>
+      <div class="verse" data-start="3.9" data-end="12">南無阿弥陀仏</div>
+      <div class="verse" data-start="12" data-end="21.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="21.4" data-end="29.7">南無阿弥陀仏</div>
+      <div class="verse" data-start="29.7" data-end="37.7">南無阿弥陀仏</div>
+      <div class="verse" data-start="37.7" data-end="45.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="45.9" data-end="54.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="54.3" data-end="56.8">南</div>
 
       <h3>（一首目）</h3>
-      <div class="verse">彌陀成佛のこのかたは</div>
-      <div class="verse">いまに十劫をへたまへり</div>
-      <div class="verse">法身の光輪きはもなく</div>
-      <div class="verse">世の盲冥をてらすなり</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南</div>
+      <div class="verse" data-start="56.8" data-end="75.6">彌陀成佛のこのかたは</div>
+      <div class="verse" data-start="75.6" data-end="92">いまに十劫をへたまへり</div>
+      <div class="verse" data-start="92" data-end="102.3">法身の光輪きはもなく</div>
+      <div class="verse" data-start="108.7" data-end="121.4">世の盲冥をてらすなり</div>
+      <div class="verse" data-start="121.5" data-end="129.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="129.5" data-end="137.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="137.2" data-end="145.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="145.2" data-end="153.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="153.4" data-end="155.9">南</div>
 
       <h3>（二首目）</h3>
-      <div class="verse">智慧の光明はかりなし</div>
-      <div class="verse">有量の諸相ことごとく</div>
-      <div class="verse">光暁かぶらぬものはなし</div>
-      <div class="verse">眞實明に帰命せよ</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無</div>
-      <div class="verse">阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南</div>
+      <div class="verse" data-start="155.9" data-end="173.7">智慧の光明はかりなし</div>
+      <div class="verse" data-start="173.7" data-end="187.8">有量の諸相ことごとく</div>
+      <div class="verse" data-start="187.8" data-end="203.2">光暁かぶらぬものはなし</div>
+      <div class="verse" data-start="203.2" data-end="215.5">眞實明に帰命せよ</div>
+      <div class="verse" data-start="215.5" data-end="223.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="223.3" data-end="231.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="231.3" data-end="239">南無阿弥陀仏</div>
+      <div class="verse" data-start="239" data-end="246.7">南無</div>
+      <div class="verse" data-start="246.7" data-end="256.7">阿弥陀仏</div>
+      <div class="verse" data-start="256.7" data-end="264.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="264.5" data-end="272">南無阿弥陀仏</div>
+      <div class="verse" data-start="272" data-end="280.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="280.4" data-end="287.6">南無阿弥陀仏</div>
+      <div class="verse" data-start="287.6" data-end="295">南無阿弥陀仏</div>
+      <div class="verse" data-start="295" data-end="302.6">南無阿弥陀仏</div>
+      <div class="verse" data-start="302.6" data-end="305.2">南</div>
 
       <h3>（三首目）</h3>
-      <div class="verse">解脱の光輪きはもなし</div>
-      <div class="verse">光触かぶるものはみな</div>
-      <div class="verse">有無をはなるとのべたまふ</div>
-      <div class="verse">平等覚に帰命せよ</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南</div>
+      <div class="verse" data-start="305.2" data-end="326.5">解脱の光輪きはもなし</div>
+      <div class="verse" data-start="326.5" data-end="340.2">光触かぶるものはみな</div>
+      <div class="verse" data-start="340.2" data-end="353.2">有無をはなるとのべたまふ</div>
+      <div class="verse" data-start="353.2" data-end="365.5">平等覚に帰命せよ</div>
+      <div class="verse" data-start="365.5" data-end="372.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="372.9" data-end="380.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="380.9" data-end="387.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="387.9" data-end="395.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="395.2" data-end="398.1">南</div>
 
       <h3>（四首目）</h3>
-      <div class="verse">光雲無碍如虚空</div>
-      <div class="verse">一切の有碍にさはりなし</div>
-      <div class="verse">光沢かふらぬものぞなき</div>
-      <div class="verse">難思議を帰命せよ</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南</div>
+      <div class="verse" data-start="398.1" data-end="418.2">光雲無碍如虚空</div>
+      <div class="verse" data-start="418.2" data-end="427.4">一切の有碍にさはりなし</div>
+      <div class="verse" data-start="427.8" data-end="445.3">光沢かふらぬものぞなき</div>
+      <div class="verse" data-start="445.4" data-end="457.3">難思議を帰命せよ</div>
+      <div class="verse" data-start="457.3" data-end="464.8">南無阿弥陀仏</div>
+      <div class="verse" data-start="464.8" data-end="471.8">南無阿弥陀仏</div>
+      <div class="verse" data-start="471.8" data-end="483.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="483.2" data-end="495.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="495.4" data-end="504.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="504.3" data-end="512.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="512.3" data-end="520.6">南無阿弥陀仏</div>
+      <div class="verse" data-start="520.6" data-end="528.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="528.5" data-end="536.1">南無阿弥陀仏</div>
+      <div class="verse" data-start="536.1" data-end="544.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="544.3" data-end="546.5">南</div>
 
       <h3>（五首目）</h3>
-      <div class="verse">清浄光明ならびなし</div>
-      <div class="verse">遇斯光のゆへなれば</div>
-      <div class="verse">一切の業繋ものぞこりぬ</div>
-      <div class="verse">畢竟依を帰命せよ</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南無阿弥陀仏</div>
-      <div class="verse">南</div>
+      <div class="verse" data-start="546.5" data-end="567.6">清浄光明ならびなし</div>
+      <div class="verse" data-start="567.6" data-end="581.4">遇斯光のゆへなれば</div>
+      <div class="verse" data-start="581.4" data-end="597.3">一切の業繋ものぞこりぬ</div>
+      <div class="verse" data-start="597.3" data-end="610">畢竟依を帰命せよ</div>
+      <div class="verse" data-start="610" data-end="617.7">南無阿弥陀仏</div>
+      <div class="verse" data-start="617.7" data-end="625.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="625.5" data-end="633.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="633.2" data-end="641.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="641.4" data-end="643.7">南</div>
 
       <h3>（六首目）</h3>
-      <div class="verse">佛光照曜最第一</div>
-      <div class="verse">光炎王仏となづけたり</div>
-      <div class="verse">三塗の黒闇ひらくなり</div>
-      <div class="verse">大応供を帰命せよ</div>
+      <div class="verse" data-start="643.7" data-end="660.5">佛光照曜最第一</div>
+      <div class="verse" data-start="660.5" data-end="676.2">光炎王仏となづけたり</div>
+      <div class="verse" data-start="676.2" data-end="690.2">三塗の黒闇ひらくなり</div>
+      <div class="verse" data-start="690.2" data-end="703.4">大応供を帰命せよ</div>
+
+      <h2>回向句</h2>
+      <div class="verse" data-start="704.4" data-end="722.8">願以此功徳</div>
+      <div class="verse" data-start="722.8" data-end="733.5">平等施一切</div>
+      <div class="verse" data-start="733.5" data-end="743.9">同発菩提心</div>
+      <div class="verse" data-start="743.9" data-end="755.0">往生安楽国</div>
+
+
     </section>
 
-    <!-- ■■■ 回向句 ■■■ -->
-    <section>
-      <h2>回向句</h2>
-      <div class="verse">願以此功徳</div>
-      <div class="verse">平等施一切</div>
-      <div class="verse">同発菩提心</div>
-      <div class="verse">往生安楽国</div>
-    </section>
 
   </div><!-- /#text-wrapper -->
 
   <!-- Ⓒ バー生成 & 音声同期 ---------------------------------------- -->
+  <!-- ◇ JS … これだけで OK -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-      /* <span class="body">＋バーを追加（初回だけ） */
+      /* ---- セレクタで曲と表示を切替 ---- */
+      const audio = document.getElementById('audio');
+      const sel = document.getElementById('chantSel');
+      const blocks = {
+        shoshinge: document.getElementById('shoshinge'),
+        wasan: document.getElementById('wasan')
+      };
+      const sources = {
+        shoshinge: 'audio/shoshinge.mp3',
+        wasan: 'audio/nenbutuwasan.mp3'
+      };
+      function switchChant(key) {
+        audio.src = sources[key];
+        Object.entries(blocks).forEach(([k, sec]) => { sec.hidden = (k !== key); });
+        audio.currentTime = 0;
+        audio.play();
+      }
+      switchChant('shoshinge');          // 初期セット
+      sel.addEventListener('change', e => switchChant(e.target.value));
+
+      /* ---- 各 verse に <span.body> と progress-bar を挿入 ---- */
       document.querySelectorAll('.verse').forEach(v => {
         if (!v.querySelector('.body')) {
           v.innerHTML = `<span class="body">${v.textContent.trim()}</span><div class="progress-bar"></div>`;
         }
       });
 
-      const audio = document.getElementById('audio');
+      /* ---- 再生位置に合わせてバーを伸ばす ---- */
       const verses = [...document.querySelectorAll('.verse')];
-
-      /* 再生位置に合わせて高さ(px)を更新 */
       audio.addEventListener('timeupdate', () => {
         const now = audio.currentTime;
         verses.forEach(v => {
@@ -302,15 +338,72 @@
           const body = v.querySelector('.body');
           const s = parseFloat(v.dataset.start);
           const e = parseFloat(v.dataset.end);
-          if (isNaN(s) || isNaN(e)) return;          // タイムスタンプ無い句はスキップ
-
-          const r = now < s ? 0 : now > e ? 1 : (now - s) / (e - s);
-          bar.style.height = (body.offsetHeight * r) + 'px';
+          if (isNaN(s) || isNaN(e)) { bar.style.height = 0; return; }   // タイムスタンプ無い行
+          const ratio = now < s ? 0 : now > e ? 1 : (now - s) / (e - s);
+          bar.style.height = (body.offsetHeight * ratio) + 'px';
         });
       });
 
     });
   </script>
+
+  <!-- ▼ クリックで data-start / data-end を付けるツール -->
+  <script>
+    /* ===========================================================
+       ★ ここが “タイムスタンプ収集ツール” 本体
+       -----------------------------------------------------------
+       変更点に ★ コメントを付けました
+    =========================================================== */
+
+    // ★ 1) いつでも参照できるよう、audio 要素をここで取得
+    const audio = document.getElementById('audio');
+
+    // ★ 2) 直前にクリックした <div class="verse"> を保持
+    let last = null;
+
+    /* -----------------------------------------------------------
+       句クリック → data-start を付与
+       （text-wrapper 内でバブリングを拾う形に変更）
+    ----------------------------------------------------------- */
+    document.getElementById('text-wrapper')
+      .addEventListener('click', e => {
+
+        // クリックされた要素が .verse（またはその子）か判定
+        const v = e.target.closest('.verse');
+        if (!v) return;                 // 句以外は無視
+
+        // 再生中でなければ警告
+        if (audio.paused) {
+          alert('再生を開始してからクリックしてください');
+          return;
+        }
+
+        // ★ 3) 現在位置（小数 1 桁）を取得して start に書き込み
+        const t = Number(audio.currentTime.toFixed(1));
+        v.dataset.start = t;
+
+        // ★ 4) 直前にクリックした句に end を書き込み
+        if (last && !last.dataset.end) last.dataset.end = t;
+        last = v;
+
+        console.log(`${v.textContent}  →  start = ${t}`);
+      });
+
+    /* -----------------------------------------------------------
+       Esc キーで “完成版 HTML” を console に出力
+       （ここは元のコードと同じ・位置だけ修正）
+    ----------------------------------------------------------- */
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Escape') {
+        console.log('----- timestamped HTML -----\n',
+          document.documentElement.outerHTML);
+        alert('console に完成 HTML を出力しました');
+      }
+    });
+
+  </script>
+
+
 
 </body>
 
