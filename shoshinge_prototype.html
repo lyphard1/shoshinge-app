@@ -68,7 +68,8 @@
       <option value="shoshinge" selected>正信偈</option>
       <option value="wasan">念仏和讃</option>
     </select><br>
-    <audio id="audio" controls></audio>
+    <audio id="audio" controls preload="none" crossorigin="anonymous"></audio>
+
   </div>
 
   <!-- ◇ テキスト２本 -->
@@ -310,14 +311,22 @@
         wasan: document.getElementById('wasan')
       };
       const sources = {
-        shoshinge: 'https://github.com/lyphard1/shoshinge-app/releases/download/audio-v1/shoshinge.mp3',
-        wasan: 'https://github.com/lyphard1/shoshinge-app/releases/download/audio-v1/nenbutuwasan.mp3'
+        shoshinge: 'audio/shoshinge.mp3',
+        wasan: 'audio/nenbutuwasan.mp3'
+        //shoshinge: 'https://github.com/lyphard1/shoshinge-app/releases/download/audio-v1/shoshinge.mp3',
+        //wasan: 'https://github.com/lyphard1/shoshinge-app/releases/download/audio-v1/nenbutuwasan.mp3'
       };
       function switchChant(key) {
         audio.src = sources[key];
         Object.entries(blocks).forEach(([k, sec]) => { sec.hidden = (k !== key); });
         audio.currentTime = 0;
-        audio.play();
+        // ▶ 再生を試みる（失敗しても無視）
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // 自動再生ブロック時はここに来る。UI はそのままにする。
+          });
+        }
       }
       switchChant('shoshinge');          // 初期セット
       sel.addEventListener('change', e => switchChant(e.target.value));
