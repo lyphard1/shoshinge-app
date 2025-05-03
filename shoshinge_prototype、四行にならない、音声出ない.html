@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>正信偈 アプリ main2</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Hiragino Mincho ProN", serif;
+      background: white;
+    }
+
+    .page {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      height: 90vh;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      font-size: 24px;
+      padding: 20px;
+    }
+
+    .page.active {
+      display: flex;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem;
+    }
+
+    #progressContainer {
+      width: 80%;
+      height: 10px;
+      background: #ccc;
+      margin: 0 auto;
+      border-radius: 5px;
+    }
+
+    #progressBar {
+      height: 10px;
+      width: 0%;
+      background: #4caf50;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 再生コントロール -->
+  <div id="controls">
+    <button id="playBtn">▶️ 再生</button>
+    <button id="pauseBtn">⏸️ 一時停止</button>
+  </div>
+
+  <!-- プログレスバー -->
+  <div id="progressContainer">
+    <div id="progressBar"></div>
+  </div>
+
+  <!-- 正信偈本文ページ -->
+  <!-- ※以下はshoshinge_prototype.htmlの中身を直接ここに貼り付けてOKです -->
+  <!-- 簡易に一部例示 -->
+  <div class="page">
+    <div class="verse" data-start="7.1" data-end="21.9">帰命無量寿如来</div>
+    <div class="verse" data-start="21.9" data-end="30.9">南無不可思議光</div>
+    <div class="verse" data-start="30.9" data-end="38.7">法蔵菩薩因位時</div>
+    <div class="verse" data-start="38.7" data-end="46.0">在世自在王仏所</div>
+    <div class="verse" data-start="46.0" data-end="53.0">覩見諸仏浄土因</div>
+    <div class="verse" data-start="53.0" data-end="59.9">国土人天之善悪</div>
+    <div class="verse" data-start="59.9" data-end="66.9">建立無上殊勝願</div>
+    <div class="verse" data-start="66.9" data-end="73.4">超発希有大弘誓</div>
+    <div class="verse" data-start="73.4" data-end="80.1">五劫思惟之摂受</div>
+    <div class="verse" data-start="80.1" data-end="86.9">重誓名声聞十方</div>
+    <div class="verse" data-start="86.9" data-end="93.7">普放無量無辺光</div>
+    <div class="verse" data-start="93.7" data-end="100.4">無碍無対光炎王</div>
+    <div class="verse" data-start="100.4" data-end="107.0">清浄歓喜智慧光</div>
+    <div class="verse" data-start="107.0" data-end="113.7">不断難思無称光</div>
+    <div class="verse" data-start="113.7" data-end="120.2">超日月光照塵刹</div>
+    <div class="verse" data-start="120.2" data-end="126.8">一切群生蒙光照</div>
+    <div class="verse" data-start="126.8" data-end="133.3">本願名号正定業</div>
+    <div class="verse" data-start="133.3" data-end="140.0">至心信楽願為因</div>
+    <div class="verse" data-start="140.0" data-end="146.5">成等覚証大涅槃</div>
+    <div class="verse" data-start="146.5" data-end="153.0">必至滅度願成就</div>
+    <div class="verse" data-start="153.0" data-end="159.3">如来所以興出世</div>
+    <div class="verse" data-start="159.3" data-end="165.9">唯説弥陀本願海</div>
+    <div class="verse" data-start="165.9" data-end="172.3">五濁悪時群生海</div>
+    <div class="verse" data-start="172.3" data-end="178.7">応信如来如実言</div>
+    <div class="verse" data-start="178.7" data-end="185.0">能発一念喜愛心</div>
+    <div class="verse" data-start="185.0" data-end="191.4">不断煩悩得涅槃</div>
+    <div class="verse" data-start="191.4" data-end="197.7">凡聖逆謗斉廻入</div>
+    <div class="verse" data-start="197.7" data-end="204.2">如衆水入海一味</div>
+    <div class="verse" data-start="204.2" data-end="210.6">摂取心光常照護</div>
+    <div class="verse" data-start="210.6" data-end="217.1">已能雖破無明闇</div>
+    <div class="verse" data-start="217.1" data-end="223.5">貪愛瞋憎之雲霧</div>
+    <div class="verse" data-start="223.5" data-end="229.7">常覆真実信心天</div>
+    <div class="verse" data-start="229.7" data-end="236.0">譬如日光覆雲霧</div>
+    <div class="verse" data-start="236.0" data-end="242.7">雲霧之下明無闇</div>
+    <div class="verse" data-start="242.7" data-end="248.7">獲信見敬大慶喜</div>
+    <div class="verse" data-start="248.7" data-end="254.9">即横超截五悪趣</div>
+    <div class="verse" data-start="254.9" data-end="261.1">一切善悪凡夫人</div>
+    <div class="verse" data-start="261.1" data-end="267.4">聞信如来弘誓願</div>
+    <div class="verse" data-start="267.4" data-end="273.7">仏言広大勝解者</div>
+    <div class="verse" data-start="273.7" data-end="279.9">是人名分陀利華</div>
+    <div class="verse" data-start="279.9" data-end="285.9">弥陀仏本願念仏</div>
+    <div class="verse" data-start="285.9" data-end="292.1">邪見驕慢悪衆生</div>
+    <div class="verse" data-start="292.1" data-end="298.3">信楽受持甚以難</div>
+    <div class="verse" data-start="298.3" data-end="304.4">難中之難無過斯</div>
+    <div class="verse" data-start="304.4" data-end="310.6">印度西天之論家</div>
+    <div class="verse" data-start="310.6" data-end="319.8">中夏日域之高僧</div>
+    <div class="verse" data-start="319.8" data-end="325.8">顕大聖興世正意</div>
+    <div class="verse" data-start="325.8" data-end="331.9">明如来本誓応機</div>
+    <div class="verse" data-start="331.9" data-end="338.1">釈迦如来楞伽山</div>
+    <div class="verse" data-start="338.1" data-end="347.2">為衆告命南天竺</div>
+    <div class="verse" data-start="347.2" data-end="353.3">龍樹大士出於世</div>
+    <div class="verse" data-start="353.3" data-end="359.3">悉能摧破有無見</div>
+    <div class="verse" data-start="359.3" data-end="365.3">宣説大乗無上法</div>
+    <div class="verse" data-start="365.3" data-end="371.3">証歓喜地生安楽</div>
+    <div class="verse" data-start="371.3" data-end="377.3">顕示難行陸路苦</div>
+    <div class="verse" data-start="377.3" data-end="383.4">信楽易行水道楽</div>
+    <div class="verse" data-start="383.4" data-end="389.5">憶念弥陀仏本願</div>
+    <div class="verse" data-start="389.5" data-end="398.6">自然即時入必定</div>
+    <div class="verse" data-start="398.6" data-end="404.7">唯能常称如来号</div>
+    <div class="verse" data-start="404.7" data-end="410.7">応報大悲弘誓恩</div>
+    <div class="verse" data-start="410.7" data-end="416.7">天親菩薩造論説</div>
+    <div class="verse" data-start="416.7" data-end="422.9">帰命無碍光如来</div>
+    <div class="verse" data-start="422.9" data-end="429.0">依修多羅顕真実</div>
+    <div class="verse" data-start="429.0" data-end="434.9">光闡横超大誓願</div>
+    <div class="verse" data-start="434.9" data-end="440.8">広由本願力回向</div>
+    <div class="verse" data-start="440.8" data-end="447.1">為度群生彰一心</div>
+    <div class="verse" data-start="447.1" data-end="453.1">帰入功徳大宝海</div>
+    <div class="verse" data-start="453.1" data-end="459.2">必獲入大会衆数</div>
+    <div class="verse" data-start="459.2" data-end="465.2">得至蓮華蔵世界</div>
+    <div class="verse" data-start="465.2" data-end="471.2">即証真如法性身</div>
+    <div class="verse" data-start="471.2" data-end="477.2">遊煩悩林現神通</div>
+    <div class="verse" data-start="477.2" data-end="483.1">入生死園示応化</div>
+    <div class="verse" data-start="483.1" data-end="489.1">本師曇鸞梁天子</div>
+    <div class="verse" data-start="489.1" data-end="495.3">常向鸞処菩薩礼</div>
+    <div class="verse" data-start="495.3" data-end="501.3">三蔵流支授浄教</div>
+    <div class="verse" data-start="501.3" data-end="507.2">焚焼仙経帰楽邦</div>
+    <div class="verse" data-start="507.2" data-end="513.2">天親菩薩論註解</div>
+    <div class="verse" data-start="513.2" data-end="519.2">報土因果顕誓願</div>
+    <div class="verse" data-start="519.2" data-end="525.1">往還回向由他力</div>
+    <div class="verse" data-start="525.1" data-end="531.1">正定之因唯信心</div>
+    <div class="verse" data-start="531.1" data-end="537.1">惑染凡夫信心発</div>
+    <div class="verse" data-start="537.1" data-end="543.2">証知生死即涅槃</div>
+    <div class="verse" data-start="543.2" data-end="549.3">必至無量光明土</div>
+    <div class="verse" data-start="549.3" data-end="555.3">諸有衆生皆普化</div>
+    <div class="verse" data-start="555.3" data-end="561.3">道綽決聖道難証</div>
+    <div class="verse" data-start="561.3" data-end="567.5">唯明浄土可通入</div>
+    <div class="verse" data-start="567.5" data-end="573.6">万善自力貶勤修</div>
+    <div class="verse" data-start="573.6" data-end="579.5">円満徳号勧専称</div>
+    <div class="verse" data-start="579.5" data-end="585.3">三不三信誨慇懃</div>
+    <div class="verse" data-start="585.3" data-end="591.5">像末法滅同悲引</div>
+    <div class="verse" data-start="591.5" data-end="597.8">一生造悪値弘誓</div>
+    <div class="verse" data-start="597.8" data-end="612.5">至安養界証妙果</div>
+    <div class="verse" data-start="612.5" data-end="628.3">善導独明仏正意</div>
+    <div class="verse" data-start="628.3" data-end="637.4">矜哀定散与逆悪</div>
+    <div class="verse" data-start="637.4" data-end="645.5">光明名号顕因縁</div>
+    <div class="verse" data-start="645.5" data-end="652.7">開入本願大智海</div>
+    <div class="verse" data-start="652.7" data-end="659.6">行者正受金剛心</div>
+    <div class="verse" data-start="659.6" data-end="666.4">慶喜一念相応後</div>
+    <div class="verse" data-start="666.4" data-end="673.1">与韋提等獲三忍</div>
+    <div class="verse" data-start="673.1" data-end="679.9">即証法性之常楽</div>
+    <div class="verse" data-start="679.9" data-end="686.5">源信広開一代教</div>
+    <div class="verse" data-start="686.5" data-end="693.2">偏帰安養勧一切</div>
+    <div class="verse" data-start="693.2" data-end="699.8">専雑執心判浅深</div>
+    <div class="verse" data-start="699.8" data-end="706.4">報化二土正弁立</div>
+    <div class="verse" data-start="706.4" data-end="712.9">極重悪人唯称仏</div>
+    <div class="verse" data-start="712.9" data-end="719.4">我亦在彼摂取中</div>
+    <div class="verse" data-start="719.4" data-end="725.8">煩悩障眼雖不見</div>
+    <div class="verse" data-start="725.8" data-end="732.2">大悲無倦常照我</div>
+    <div class="verse" data-start="732.2" data-end="738.7">本師源空明仏教</div>
+    <div class="verse" data-start="738.7" data-end="745.1">憐愍善悪凡夫人</div>
+    <div class="verse" data-start="745.1" data-end="751.7">真宗教証興片州</div>
+    <div class="verse" data-start="751.7" data-end="757.9">選択本願弘悪世</div>
+    <div class="verse" data-start="757.9" data-end="764.3">還来生死輪転家</div>
+    <div class="verse" data-start="764.3" data-end="770.9">決以疑情為所止</div>
+    <div class="verse" data-start="770.9" data-end="777.3">速入寂静無為楽</div>
+    <div class="verse" data-start="777.3" data-end="784.8">必以信心為能入</div>
+    <div class="verse" data-start="784.8" data-end="796.5">弘経大士宗師等</div>
+    <div class="verse" data-start="797.3" data-end="809.2">拯済無辺極濁悪</div>
+    <div class="verse" data-start="809.2" data-end="821.1">道俗時衆共同心</div>
+    <div class="verse" data-start="821.1" data-end="827.0">唯可信斯高僧説</div>
+    </section>
+
+    <!-- ■■■ 念仏和讃（タイムスタンプなし / バーは常時 0%） ■■■ -->
+    <section id="wasan" class="chant-block" hidden>
+      <h2>念仏和讃</h2>
+      <div class="verse" data-start="3.9" data-end="12">南無阿弥陀仏</div>
+      <div class="verse" data-start="12" data-end="21.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="21.4" data-end="29.7">南無阿弥陀仏</div>
+      <div class="verse" data-start="29.7" data-end="37.7">南無阿弥陀仏</div>
+      <div class="verse" data-start="37.7" data-end="45.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="45.9" data-end="54.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="54.3" data-end="56.8">南</div>
+
+      <h3>（一首目）</h3>
+      <div class="verse" data-start="56.8" data-end="75.6">彌陀成佛のこのかたは</div>
+      <div class="verse" data-start="75.6" data-end="92">いまに十劫をへたまへり</div>
+      <div class="verse" data-start="92" data-end="102.3">法身の光輪きはもなく</div>
+      <div class="verse" data-start="108.7" data-end="121.4">世の盲冥をてらすなり</div>
+      <div class="verse" data-start="121.5" data-end="129.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="129.5" data-end="137.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="137.2" data-end="145.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="145.2" data-end="153.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="153.4" data-end="155.9">南</div>
+
+      <h3>（二首目）</h3>
+      <div class="verse" data-start="155.9" data-end="173.7">智慧の光明はかりなし</div>
+      <div class="verse" data-start="173.7" data-end="187.8">有量の諸相ことごとく</div>
+      <div class="verse" data-start="187.8" data-end="203.2">光暁かぶらぬものはなし</div>
+      <div class="verse" data-start="203.2" data-end="215.5">眞實明に帰命せよ</div>
+      <div class="verse" data-start="215.5" data-end="223.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="223.3" data-end="231.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="231.3" data-end="239">南無阿弥陀仏</div>
+      <div class="verse" data-start="239" data-end="246.7">南無</div>
+      <div class="verse" data-start="246.7" data-end="256.7">阿弥陀仏</div>
+      <div class="verse" data-start="256.7" data-end="264.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="264.5" data-end="272">南無阿弥陀仏</div>
+      <div class="verse" data-start="272" data-end="280.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="280.4" data-end="287.6">南無阿弥陀仏</div>
+      <div class="verse" data-start="287.6" data-end="295">南無阿弥陀仏</div>
+      <div class="verse" data-start="295" data-end="302.6">南無阿弥陀仏</div>
+      <div class="verse" data-start="302.6" data-end="305.2">南</div>
+
+      <h3>（三首目）</h3>
+      <div class="verse" data-start="305.2" data-end="326.5">解脱の光輪きはもなし</div>
+      <div class="verse" data-start="326.5" data-end="340.2">光触かぶるものはみな</div>
+      <div class="verse" data-start="340.2" data-end="353.2">有無をはなるとのべたまふ</div>
+      <div class="verse" data-start="353.2" data-end="365.5">平等覚に帰命せよ</div>
+      <div class="verse" data-start="365.5" data-end="372.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="372.9" data-end="380.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="380.9" data-end="387.9">南無阿弥陀仏</div>
+      <div class="verse" data-start="387.9" data-end="395.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="395.2" data-end="398.1">南</div>
+
+      <h3>（四首目）</h3>
+      <div class="verse" data-start="398.1" data-end="418.2">光雲無碍如虚空</div>
+      <div class="verse" data-start="418.2" data-end="427.4">一切の有碍にさはりなし</div>
+      <div class="verse" data-start="427.8" data-end="445.3">光沢かふらぬものぞなき</div>
+      <div class="verse" data-start="445.4" data-end="457.3">難思議を帰命せよ</div>
+      <div class="verse" data-start="457.3" data-end="464.8">南無阿弥陀仏</div>
+      <div class="verse" data-start="464.8" data-end="471.8">南無阿弥陀仏</div>
+      <div class="verse" data-start="471.8" data-end="483.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="483.2" data-end="495.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="495.4" data-end="504.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="504.3" data-end="512.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="512.3" data-end="520.6">南無阿弥陀仏</div>
+      <div class="verse" data-start="520.6" data-end="528.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="528.5" data-end="536.1">南無阿弥陀仏</div>
+      <div class="verse" data-start="536.1" data-end="544.3">南無阿弥陀仏</div>
+      <div class="verse" data-start="544.3" data-end="546.5">南</div>
+
+      <h3>（五首目）</h3>
+      <div class="verse" data-start="546.5" data-end="567.6">清浄光明ならびなし</div>
+      <div class="verse" data-start="567.6" data-end="581.4">遇斯光のゆへなれば</div>
+      <div class="verse" data-start="581.4" data-end="597.3">一切の業繋ものぞこりぬ</div>
+      <div class="verse" data-start="597.3" data-end="610">畢竟依を帰命せよ</div>
+      <div class="verse" data-start="610" data-end="617.7">南無阿弥陀仏</div>
+      <div class="verse" data-start="617.7" data-end="625.5">南無阿弥陀仏</div>
+      <div class="verse" data-start="625.5" data-end="633.2">南無阿弥陀仏</div>
+      <div class="verse" data-start="633.2" data-end="641.4">南無阿弥陀仏</div>
+      <div class="verse" data-start="641.4" data-end="643.7">南</div>
+
+      <h3>（六首目）</h3>
+      <div class="verse" data-start="643.7" data-end="660.5">佛光照曜最第一</div>
+      <div class="verse" data-start="660.5" data-end="676.2">光炎王仏となづけたり</div>
+      <div class="verse" data-start="676.2" data-end="690.2">三塗の黒闇ひらくなり</div>
+      <div class="verse" data-start="690.2" data-end="703.4">大応供を帰命せよ</div>
+
+      <h2>回向句</h2>
+      <div class="verse" data-start="704.4" data-end="722.8">願以此功徳</div>
+      <div class="verse" data-start="722.8" data-end="733.5">平等施一切</div>
+      <div class="verse" data-start="733.5" data-end="743.9">同発菩提心</div>
+      <div class="verse" data-start="743.9" data-end="755.0">往生安楽国</div>
+
+      <!-- 続きもコピーして反映 -->
+
+      <audio id="audio" src="shoshinge.mp3"></audio>
+
+      <script>
+        const audio = document.getElementById('audio');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const progressBar = document.getElementById('progressBar');
+        const pages = document.querySelectorAll('.page');
+
+        let current = 0;
+
+        function showPage(n) {
+          pages.forEach((page, idx) => {
+            page.classList.toggle('active', idx === n);
+          });
+        }
+        showPage(current);
+
+        // 再生/停止
+        playBtn.addEventListener('click', () => audio.play());
+        pauseBtn.addEventListener('click', () => audio.pause());
+
+        // 時間に応じたページ切り替え
+        audio.addEventListener('timeupdate', () => {
+          const currentTime = audio.currentTime;
+          const duration = audio.duration;
+          if (duration) {
+            const percent = (currentTime / duration) * 100;
+            progressBar.style.width = percent + '%';
+          }
+
+          // verseタグから適切なページ表示に切り替え
+          pages.forEach((page, idx) => {
+            const verses = page.querySelectorAll('.verse');
+            verses.forEach(verse => {
+              const start = parseFloat(verse.dataset.start);
+              const end = parseFloat(verse.dataset.end);
+              if (currentTime >= start && currentTime < end) {
+                showPage(idx);
+              }
+            });
+          });
+        });
+      </script>
+
+</body>
+
+</html>
