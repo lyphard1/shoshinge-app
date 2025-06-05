@@ -3,11 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>正信偈アプリ (ルビ表示対応版)</title>
+  <title>正信偈アプリ (ルビ・ハイライト修正版)</title>
   <style>
     body {
       font-family: "Hiragino Mincho ProN", "MS Mincho", serif;
-
       margin: 0;
       padding: 20px;
       background: white;
@@ -107,7 +106,6 @@
       min-height: 300px;
     }
 
-
     .page {
       writing-mode: vertical-rl;
       text-orientation: upright;
@@ -133,56 +131,28 @@
 
     .verse {
       padding: 8px 0;
-      /* ルビの分、少し余白を広げる */
       border-radius: 3px;
       text-align: center;
       line-height: 1.8;
-      /* ルビ表示のため行間を少し広げる */
       cursor: pointer;
       transition: background-color 0.2s ease;
-      /* background-color: rgba(255,0,0,0.1); */
-      /* デバッグ用 */
+      /* display: flex; */
+      /* 中央揃えのために追加したものを一旦コメントアウト */
+      /* flex-direction: column; */
+      /* justify-content: center; */
+      /* align-items: center; */
+      /* min-height: calc(26px * 7 * 1.2); */
+      /* 長さ調整も一旦コメントアウト */
     }
 
     .verse:hover {
       background-color: #f0f0f0;
     }
 
-    /* --- ルビ表示のためのスタイル --- */
-    .verse {
-      padding: 8px 0;
-      border-radius: 3px;
-      /* text-align: center; */
-      /* ← ruby要素がflexになったので不要かも */
-      line-height: 1.8;
-      /* 親要素の行間はそのまま */
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-
-      /* ▼▼▼ 追加/変更 ▼▼▼ */
-      display: flex;
-      /* Flexbox を使用 */
-      flex-direction: column;
-      /* 縦書きなので、中の要素を縦に並べる */
-      justify-content: center;
-      /* 主軸（縦）方向の中央揃え */
-      align-items: center;
-      /* 交差軸（横）方向の中央揃え */
-      min-height: calc(26px * 7 * 2.5);
-      /* 親文字サイズ×文字数×行間の目安 (要調整) */
-      /* 26px は .page の font-size */
-      /* 1.2 は余裕を持たせた係数 (ルビも考慮) */
-      /* この値は実際の表示を見ながら調整してください */
-      /* background-color: rgba(0, 255, 0, 0.1); */
-      /* デバッグ用 */
-    }
-
     .verse ruby {
       display: ruby;
-      /* line-height: 1; */
-      /* ruby要素自体の行間は1で良いかも */
+      line-height: 1;
       text-align: center;
-      /* これは漢字とルビの横方向の位置関係に影響 */
     }
 
     .verse rt {
@@ -192,23 +162,18 @@
       ruby-align: center;
     }
 
-    /* ----------------------------- */
-
-    .highlight ruby {
-      /* ハイライト時は背景色のみ変更 */
+    /* ▼▼▼ ハイライトのスタイルを修正 ▼▼▼ */
+    .verse.highlight ruby rb {
+      /* .verse に .highlight が付いた場合、その中の <rb> の背景を変える */
       background-color: #ffeb3b;
-      display: inline-block;
-      /* 背景色を付けるために必要かも */
-      padding: 2px 4px;
-      /* 背景色のパディング */
+      padding: 1px 3px;
+      /* パディングを少し調整 */
       border-radius: 3px;
+      /* display: inline; */
+      /* displayプロパティは<rb>のデフォルトに任せるか、必要なら調整 */
     }
 
-    /* ハイライト時のテキスト色は不要なら削除 */
-    /* .highlight ruby rb,
-    .highlight ruby rt {
-        color: black;
-    } */
+    /* ▲▲▲ ハイライトのスタイルを修正 ▲▲▲ */
   </style>
 </head>
 
@@ -236,7 +201,6 @@
   <div id="pagesContainer"></div>
 
   <script>
-    // --- 要素の取得 (変更なし) ---
     const audio = document.getElementById('audio');
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
@@ -248,21 +212,15 @@
       wasan: document.getElementById('btn-wasan')
     };
 
-    // --- 状態変数 (変更なし) ---
     let currentMode = 'shoshinge';
     let pages = [];
     let currentActivePage = null;
 
-    // --- 音声ファイルのパス定義 (変更なし) ---
     const audioFiles = {
       shoshinge: 'audio/shoshinge.mp3',
       wasan: 'audio/nenbutuwasan.mp3'
     };
 
-    // --- 句のデータ ★★★ ここに ruby プロパティを追加 ★★★ ---
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ★ 全ての句に正しい振り仮名を 'ruby:' の後に追加してください ★
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
     const originalPagesData = [
       // --- 正信偈 (shoshinge) ---
       // 最初の数行にダミーのルビを入れています
@@ -337,36 +295,25 @@
       { section: 'wasan', verses: [{ start: 743.9, end: 755.0, text: '往生安楽国', ruby: 'おうじょうあんらっこく' }] },
     ];
 
-    // --- 関数定義 ---
 
-    /**
-     * ページ要素をデータに基づいて生成し、コンテナに追加する (★ ルビ対応 ★)
-     */
+
     function createPageElement(pageData) {
       const pageDiv = document.createElement('div');
       pageDiv.classList.add('page');
       pageDiv.dataset.section = pageData.section;
-
       pageData.verses.forEach(verseData => {
         const verseDiv = document.createElement('div');
         verseDiv.classList.add('verse');
         verseDiv.dataset.start = verseData.start;
         verseDiv.dataset.end = verseData.end;
-
-        // --- <ruby> タグを生成 ---
         const rubyElement = document.createElement('ruby');
-        const rbElement = document.createElement('rb'); // 親文字 (漢字)
+        const rbElement = document.createElement('rb');
         rbElement.textContent = verseData.text;
-        const rtElement = document.createElement('rt'); // ルビ (振り仮名)
-        // ruby データがあれば設定、なければ空にする
-        rtElement.textContent = verseData.ruby || ''; // ★ ruby プロパティを参照
-
+        const rtElement = document.createElement('rt');
+        rtElement.textContent = verseData.ruby || '';
         rubyElement.appendChild(rbElement);
         rubyElement.appendChild(rtElement);
-        verseDiv.appendChild(rubyElement); // verseDiv の中に ruby 要素を入れる
-        // --- ここまで <ruby> タグ生成 ---
-
-        // 句をクリックしたらその開始時間にシークするイベントリスナー
+        verseDiv.appendChild(rubyElement);
         verseDiv.addEventListener('click', () => {
           if (!isNaN(verseData.start) && audio.duration) {
             audio.currentTime = verseData.start;
@@ -380,9 +327,6 @@
       return pageDiv;
     }
 
-    /**
-     * アプリケーションの初期化 (変更なし)
-     */
     function initialize() {
       pagesContainer.innerHTML = '';
       pages = [];
@@ -404,22 +348,16 @@
       console.log("Application initialized.");
     }
 
-    /**
-     * モード切り替え (変更なし)
-     */
     function switchMode(mode, isInitialLoad = false) {
       if (!isInitialLoad && currentMode === mode) return;
       console.log(`Switching mode to: ${mode}`);
       currentMode = mode;
       currentActivePage = null;
-
       Object.values(modeButtons).forEach(btn => btn.classList.remove('active'));
       if (modeButtons[mode]) modeButtons[mode].classList.add('active');
-
       const newAudioSrc = audioFiles[mode];
       const currentFileName = audio.currentSrc.substring(audio.currentSrc.lastIndexOf('/') + 1);
       const newFileName = newAudioSrc.substring(newAudioSrc.lastIndexOf('/') + 1);
-
       if (isInitialLoad || currentFileName !== newFileName) {
         audio.pause();
         audio.src = newAudioSrc;
@@ -430,12 +368,11 @@
         pauseBtn.disabled = true;
         console.log(`Audio source set to: ${newAudioSrc}`);
       }
-
       const firstPageOfMode = pages.find(p => p.dataset.section === mode);
       pages.forEach(p => {
         p.style.display = 'none';
         p.classList.remove('active');
-        p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
+        p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')); // ★ 修正
       });
       if (firstPageOfMode) {
         firstPageOfMode.style.display = 'flex';
@@ -445,53 +382,41 @@
       } else {
         console.warn("No pages found for mode:", mode);
       }
-      // モード切替時はハイライトをリセット
       highlightVerse(0);
-      updateActivePage(null); // 初期ページ表示を確実にする
+      updateActivePage(null);
     }
 
     /**
-     * 現在時刻に基づいて句をハイライト (★ ハイライト対象を <ruby> 要素に変更 ★)
+     * 現在時刻に基づいて句をハイライトする (★ .verse 要素にクラスを付与 ★)
      */
     function highlightVerse(currentTime) {
-      let highlightedVerseElement = null; // ハイライトされた .verse 要素
-      let highlightedRubyElement = null;  // ハイライトされた <ruby> 要素
-
+      let highlightedVerseElement = null;
       pages.forEach(p => {
         if (p.dataset.section === currentMode) {
-          // このページ内の既存のハイライトを全て解除 (ruby 要素から highlight クラスを削除)
-          p.querySelectorAll('.verse ruby.highlight').forEach(r => r.classList.remove('highlight'));
-          // 句を走査
+          p.querySelectorAll('.verse').forEach(v => { // まず全てのハイライトを解除
+            v.classList.remove('highlight');
+          });
           p.querySelectorAll('.verse').forEach(v => {
             const start = parseFloat(v.dataset.start);
             const end = parseFloat(v.dataset.end);
-            const rubyElement = v.querySelector('ruby'); // ruby 要素を取得
-
-            if (rubyElement && !isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
-              rubyElement.classList.add('highlight'); // <ruby> 要素にハイライトを適用
-              highlightedVerseElement = v; // 親の .verse 要素も記録
-              highlightedRubyElement = rubyElement;
+            if (!isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
+              v.classList.add('highlight'); // .verse 要素に highlight クラスを適用
+              highlightedVerseElement = v;
             }
           });
         } else {
-          // 非表示モードのページのハイライトも解除
-          p.querySelectorAll('.verse ruby.highlight').forEach(r => r.classList.remove('highlight'));
+          p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
         }
       });
-      // updateActivePage には親の .verse 要素を渡す
       return highlightedVerseElement;
     }
 
-    /**
-     * アクティブなページを更新 (変更なし、highlightVerseから渡される要素で判定)
-     */
+    // updateActivePage 関数は変更なしでOK
     function updateActivePage(highlightedVerseElement) {
       let pageToShow = null;
-
       if (highlightedVerseElement) {
         pageToShow = pages.find(p => p.dataset.section === currentMode && p.contains(highlightedVerseElement));
       }
-
       if (!pageToShow) {
         if (!audio.paused) {
           pageToShow = currentActivePage;
@@ -509,7 +434,6 @@
           }
         }
       }
-
       pages.forEach(p => {
         if (p === pageToShow) {
           if (!p.classList.contains('active')) {
@@ -524,8 +448,6 @@
       });
     }
 
-
-    // --- イベントハンドラ (変更なし) ---
     function playAudio() {
       const playPromise = audio.play();
       if (playPromise !== undefined) {
@@ -543,9 +465,7 @@
     function handleAudioError(e) { console.error("Audio Error:", audio.error, "Src:", audio.currentSrc); const err = audio.error; let message = `音声ファイルの読み込み/再生に失敗しました。\nファイル: ${audio.currentSrc.split('/').pop()}`; if (err) { message += `\nエラーコード: ${err.code}`; switch (err.code) { case MediaError.MEDIA_ERR_ABORTED: message += ' (読み込み中止)'; break; case MediaError.MEDIA_ERR_NETWORK: message += ' (ネットワークエラー)'; break; case MediaError.MEDIA_ERR_DECODE: message += ' (デコードエラー)'; break; case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: message += ' (ファイル形式非対応/ファイルが見つからない)'; break; default: message += ' (不明なエラー)'; } } alert(message); playBtn.disabled = true; pauseBtn.disabled = true; }
     function handleProgressBarClick(e) { if (!audio.duration || !isFinite(audio.duration)) { console.warn("Cannot seek: Audio duration not available or invalid."); return; } const rect = progressBarContainer.getBoundingClientRect(); const offsetX = e.clientX - rect.left; const newTime = (offsetX / rect.width) * audio.duration; if (isFinite(newTime)) { audio.currentTime = newTime; console.log(`Seeked to: ${newTime.toFixed(2)}s`); const highlightedVerseElement = highlightVerse(audio.currentTime); updateActivePage(highlightedVerseElement); progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%'; } else { console.warn("Cannot seek: Calculated time is not finite.", newTime); } }
 
-    // --- アプリケーション初期化実行 ---
     document.addEventListener('DOMContentLoaded', initialize);
-
   </script>
 
 </body>
