@@ -21,6 +21,21 @@
       margin-bottom: 15px;
     }
 
+    #imageContainer {
+      text-align: center;
+      margin-top: 20px;
+      min-height: 250px;
+      /* 画像の高さに応じて調整 */
+    }
+
+    #scriptureImage {
+      max-width: 100%;
+      max-height: 250px;
+      /* 画像の高さに応じて調整 */
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
     #controlsContainer {
       margin-bottom: 15px;
       padding: 10px;
@@ -200,6 +215,10 @@
 
   <div id="pagesContainer"></div>
 
+  <div id="imageContainer">
+    <img id="scriptureImage" src="" alt="経文の画像">
+  </div>
+
   <script>
     const audio = document.getElementById('audio');
     const playBtn = document.getElementById('playBtn');
@@ -207,6 +226,7 @@
     const progressBarContainer = document.getElementById('progressBarContainer');
     const progressBar = document.getElementById('progressBar');
     const pagesContainer = document.getElementById('pagesContainer');
+    const scriptureImage = document.getElementById('scriptureImage');
     const modeButtons = {
       shoshinge: document.getElementById('btn-shoshinge'),
       wasan: document.getElementById('btn-wasan')
@@ -215,6 +235,27 @@
     let currentMode = 'shoshinge';
     let pages = [];
     let currentActivePage = null;
+    let currentImageIndex = -1;
+
+    const imageFiles = {
+      shoshinge: [
+        "帰命無量寿如来.png", "都見諸仏浄土因.png", "五劫思惟之摂受.png", "清浄歓喜智慧光.png",
+        "本願名号正定業.png", "如来所以興出世.png", "能発一念喜愛心.png", "摂取心光常照護.png",
+        "譬如日光覆雲霧.png", "一切善悪凡夫人.png", "弥陀仏本願念仏.png", "印度西天之論家.png",
+        "釈迦如来楞伽山.png", "宣説大乗無上法.png", "憶念弥陀仏本願.png", "天親菩薩造論説.png",
+        "広由本願力回向.png", "得至蓮華蔵世界.png", "本師曇鸞梁天子.png", "天親菩薩論註解.png",
+        "惑染凡夫信心発.png", "道綽決聖道難証.png", "三不三信誨慇懃.png", "善導独明仏正意.png",
+        "行者正受金剛心.png", "源信広開一代教.png", "極重悪人唯称仏.png", "本師源空明仏教.png",
+        "還来生死輪転家.png", "弘経大士宗師等.png"
+      ],
+      wasan: [
+        "南無阿弥陀仏1.png", "彌陀成佛のこのかたは.png", "南無阿弥陀仏2.png", "智慧の光明はかりなし.png",
+        "南無阿弥陀仏3.png", "阿弥陀仏.png", "南無阿弥陀仏4.png", "解脱の光輪きはもなし.png",
+        "南無阿弥陀仏5.png", "光雲無碍如虚空.png", "南無阿弥陀仏6.png", "南無阿弥陀仏7.png",
+        "南無阿弥陀仏8.png", "清浄光明ならびなし.png", "南無阿弥陀仏9.png", "佛光照曜最第一.png",
+        "願以此功徳.png"
+      ]
+    };
 
     const audioFiles = {
       shoshinge: 'audio/shoshinge.mp3',
@@ -345,6 +386,7 @@
       progressBarContainer.addEventListener('click', handleProgressBarClick);
       playBtn.disabled = false;
       pauseBtn.disabled = true;
+      showImage(0); // 初期画像を表示
       console.log("Application initialized.");
     }
 
@@ -384,30 +426,67 @@
       }
       highlightVerse(0);
       updateActivePage(null);
+      showImage(0); // モード切替時に初期画像を表示
+    }
+
+    function showImage(index) {
+      if (index === currentImageIndex) return; // 同じ画像なら何もしない
+
+      const imageList = imageFiles[currentMode];
+      if (imageList && index >= 0 && index < imageList.length) {
+        const imageName = imageList[index];
+        scriptureImage.src = `image/${imageName}`;
+        scriptureImage.alt = imageName.replace('.png', '');
+        currentImageIndex = index;
+      } else {
+        // 画像リストの範囲外の場合は画像を非表示
+        scriptureImage.src = "";
+        scriptureImage.alt = "";
+        currentImageIndex = -1;
+      }
     }
 
     /**
-     * 現在時刻に基づいて句をハイライトする (★ .verse 要素にクラスを付与 ★)
+     * 現在時刻に基づいて句をハイライトし、対応する画像を表示する
      */
     function highlightVerse(currentTime) {
       let highlightedVerseElement = null;
-      pages.forEach(p => {
-        if (p.dataset.section === currentMode) {
-          p.querySelectorAll('.verse').forEach(v => { // まず全てのハイライトを解除
-            v.classList.remove('highlight');
-          });
-          p.querySelectorAll('.verse').forEach(v => {
-            const start = parseFloat(v.dataset.start);
-            const end = parseFloat(v.dataset.end);
-            if (!isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
-              v.classList.add('highlight'); // .verse 要素に highlight クラスを適用
-              highlightedVerseElement = v;
-            }
-          });
-        } else {
-          p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
+      let overallVerseIndex = -1;
+
+      // モードに応じた全verseのフラットなリストを取得
+      const versesOfMode = Array.from(pages)
+        .filter(p => p.dataset.section === currentMode)
+        .flatMap(p => Array.from(p.querySelectorAll('.verse')));
+
+      // 現在再生中のverseを探し、そのインデックスを取得
+      for (let i = 0; i < versesOfMode.length; i++) {
+        const v = versesOfMode[i];
+        const start = parseFloat(v.dataset.start);
+        const end = parseFloat(v.dataset.end);
+        if (!isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
+          overallVerseIndex = i;
+          break; // 見つかったらループを抜ける
         }
-      });
+      }
+
+      // 全てのハイライトを一旦解除
+      versesOfMode.forEach(v => v.classList.remove('highlight'));
+
+      if (overallVerseIndex !== -1) {
+        highlightedVerseElement = versesOfMode[overallVerseIndex];
+        highlightedVerseElement.classList.add('highlight');
+
+        // 画像を更新 (4句ごとに切り替え)
+        const imageIndex = Math.floor(overallVerseIndex / 4);
+        showImage(imageIndex);
+      } else {
+        // 再生中でない、または対応する句がない場合
+        if (audio.paused) {
+          // 停止中は画像を切り替えない、または最初の画像を表示
+          // showImage(0); // 必要であればコメントを外す
+        }
+      }
+
       return highlightedVerseElement;
     }
 

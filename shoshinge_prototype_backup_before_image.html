@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>正信偈アプリ (ルビ・ハイライト修正版)</title>
+    <style>
+        body {
+            font-family: "Hiragino Mincho ProN", "MS Mincho", serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* ...existing code... */
+        git checkout origin/main -- shoshinge_prototype.html git checkout origin/main -- shoshinge_prototype.html git checkout origin/main -- shoshinge_prototype.html
+    </style>
+</head>
+
+<body>
+
+    <h1>正信偈・念仏和讃</h1>
+
+    <div id="controlsContainer">
+        <div id="modeSelector">
+            <button id="btn-shoshinge" onclick="switchMode('shoshinge')" class="active">正信偈</button>
+            <button id="btn-wasan" onclick="switchMode('wasan')">念仏和讃</button>
+        </div>
+
+        <div id="playbackControls">
+            <button id="playBtn" title="再生">▶️</button>
+            <button id="pauseBtn" title="一時停止">⏸️</button>
+            <div id="progressBarContainer" title="クリックして再生位置を変更">
+                <div id="progressBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio" src="audio/shoshinge.mp3"></audio>
+
+    <div id="pagesContainer"></div>
+
+    <script>
+        // ...existing code...
+    </script>
+
+</body>
+
+</html>
