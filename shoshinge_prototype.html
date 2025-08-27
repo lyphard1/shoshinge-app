@@ -10,7 +10,7 @@
       font-family: 'Noto Sans JP', 'Hiragino Mincho ProN', 'MS Mincho', serif;
       margin: 0;
       padding: 24px;
-      background: linear-gradient(135deg, #f7fafc 0%, #e3e6ec 100%);
+      background: linear-gradient(135deg, #f7fafc 0%, #c2e9fb 50%, #81a4fd 100%);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -89,7 +89,7 @@
     #playbackControls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
     }
 
     #playbackControls button {
@@ -120,14 +120,15 @@
 
     #progressBarContainer {
       flex-grow: 1;
-      height: 14px;
+      min-width: 320px;
+      height: 18px;
       background: #e2e8f0;
-      border-radius: 7px;
+      border-radius: 9px;
       overflow: hidden;
       cursor: pointer;
       position: relative;
       margin: 0 10px;
-      box-shadow: 0 1px 4px #0001;
+      box-shadow: 0 1.5px 6px #0001;
     }
 
     #progressBar {
@@ -137,13 +138,14 @@
       transition: width 0.1s linear;
     }
 
+    /* ページと句のレイアウト調整（上下余白を削減） */
     #pagesContainer {
-      flex-grow: 1;
+      flex: 0 0 auto;
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 320px;
-      margin-top: 18px;
+      align-items: flex-start;
+      min-height: 0;
+      margin-top: 4px;
     }
 
     .page {
@@ -152,13 +154,15 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      justify-content: space-evenly;
-      height: 75vh;
-      max-height: 600px;
+      justify-content: flex-start;
+      /* 上寄せで余白削減 */
+      height: var(--page-fixed-height, 420px);
+      /* 最長ページ高さで固定 */
+      max-height: none;
       width: 92%;
       max-width: 520px;
       font-size: 28px;
-      padding: 28px 24px;
+      padding: 2px 10px;
       border: 1.5px solid #e2e8f0;
       border-radius: 14px;
       box-sizing: border-box;
@@ -166,23 +170,31 @@
       box-shadow: 0 2px 16px #0001;
     }
 
-    .page.active {
+    /* ページ内コンテンツ（句の束）中央寄せ用ラッパ */
+    .pageInner {
       display: flex;
-      animation: fadeIn 0.5s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: none; }
+      flex-direction: column;
+      align-items: center;
+      /* 句（縦書き）を束として中央に */
+      width: max-content;
+      /* コンテンツに縮む */
+      margin-left: auto;
+      margin-right: auto;
+      /* ページ内で中央配置 */
     }
 
     .verse {
-      padding: 10px 0;
+      padding: 2px 0;
+      /* さらに狭く */
       border-radius: 5px;
       text-align: center;
-      line-height: 1.9;
+      line-height: 1.6;
+      /* 行間を少し詰める */
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
       font-weight: 400;
+      width: max-content;
+      /* 横方向に伸びず、中央寄せが効く */
     }
 
     .verse:hover {
@@ -261,6 +273,7 @@
     let currentActivePage = null;
     let currentImageIndex = -1;
 
+    // 画像ファイルマップ（クリーン版）
     const imageFiles = {
       shoshinge: [
         "帰命無量寿如来.png", "都見諸仏浄土因.png", "五劫思惟之摂受.png", "清浄歓喜智慧光.png",
@@ -273,24 +286,24 @@
         "還来生死輪転家.png", "弘経大士宗師等.png"
       ],
       wasan: [
-        "南無阿弥陀仏1.png", // Page 1
-        "南無阿弥陀仏2.png", // Page 2
-        "彌陀成佛のこのかたは.png", // Page 3
-        "南無阿弥陀仏3.png", // Page 4
-        "智慧の光明はかりなし.png", // Page 5
-        "南無阿弥陀仏4.png", // Page 6
-        "阿弥陀仏.png", // Page 7
-        "南無阿弥陀仏5.png", // Page 8
-        "解脱の光輪きはもなし.png", // Page 9
-        "南無阿弥陀仏6.png", // Page 10
-        "光雲無碍如虚空.png", // Page 11
-        "南無阿弥陀仏7.png", // Page 12
-        "南無阿弥陀仏8.png", // Page 13
-        "南無阿弥陀仏9.png", // Page 14
-        "清浄光明ならびなし.png", // Page 15
-        "南無阿弥陀仏10.png", // Page 16
-        "佛光照曜最第一.png", // Page 17
-        "願以此功徳.png" // Page 18
+        "南無阿弥陀仏1.png",  // Page 1
+        "南無阿弥陀仏2.png",  // Page 2
+        "彌陀成佛のこのかたは.png",  // Page 3
+        "南無阿弥陀仏3.png",  // Page 4
+        "智慧の光明はかりなし.png",  // Page 5
+        "南無阿弥陀仏4.png",  // Page 6
+        "阿弥陀仏.png",  // Page 7
+        "南無阿弥陀仏5.png",  // Page 8
+        "解脱の光輪きはもなし.png",  // Page 9
+        "南無阿弥陀仏6.png",  // Page 10
+        "光雲無碍如虚空.png",  // Page 11
+        "南無阿弥陀仏7.png",  // Page 12
+        "南無阿弥陀仏8.png",  // Page 13
+        "南無阿弥陀仏9.png",  // Page 14
+        "清浄光明ならびなし.png",  // Page 15
+        "南無阿弥陀仏10.png",  // Page 16
+        "佛光照曜最第一.png",  // Page 17
+        "願以此功徳.png"   // Page 18
       ]
     };
 
@@ -310,7 +323,6 @@
           { start: 38.7, end: 46.0, text: '在世自在王仏所', ruby: 'ざいせいじざいおうぶっしょ' }
         ]
       },
-      // 以下、ruby プロパティを追加 (値は空文字列か、正しいルビを入れてください)
       { section: 'shoshinge', verses: [{ start: 46.0, end: 53.0, text: '覩見諸仏浄土因', ruby: 'とけんしょぶつじょうどいん' }, { start: 53.0, end: 59.9, text: '国土人天之善悪', ruby: 'こくどにんでんしぜんまく' }, { start: 59.9, end: 66.9, text: '建立無上殊勝願', ruby: 'こんりゅうむじょうしゅしょうがん' }, { start: 66.9, end: 73.4, text: '超発希有大弘誓', ruby: 'ちょうほつけーうだいぐぜい' }] },
       { section: 'shoshinge', verses: [{ start: 73.4, end: 80.1, text: '五劫思惟之摂受', ruby: 'ごこうしゆいししょうじゅ' }, { start: 80.1, end: 86.9, text: '重誓名声聞十方', ruby: 'じゅうせいみょうしょうもんじっぽう' }, { start: 86.9, end: 93.7, text: '普放無量無辺光', ruby: 'ふほうむりょうむへんこう' }, { start: 93.7, end: 100.4, text: '無碍無対光炎王', ruby: 'むげむたいこうえんのう' }] },
       // ... (以下、全ての句データに ruby: '...' を追加) ...
@@ -497,6 +509,11 @@
       const pageDiv = document.createElement('div');
       pageDiv.classList.add('page');
       pageDiv.dataset.section = pageData.section;
+
+      // 内包ラッパを追加してコンテンツを中央寄せ
+      const inner = document.createElement('div');
+      inner.classList.add('pageInner');
+
       pageData.verses.forEach(verseData => {
         const verseDiv = document.createElement('div');
         verseDiv.classList.add('verse');
@@ -518,9 +535,49 @@
             }
           }
         });
-        pageDiv.appendChild(verseDiv);
+        inner.appendChild(verseDiv);
       });
+
+      pageDiv.appendChild(inner);
       return pageDiv;
+    }
+
+    // 現在モードの全ページを計測し、最長ページの高さで固定
+    function computeFixedPageHeight() {
+      const pagesOfMode = pages.filter(p => p.dataset.section === currentMode);
+      if (pagesOfMode.length === 0) return;
+      let maxH = 0;
+      const restores = [];
+      pagesOfMode.forEach(p => {
+        // 表示状態を一時的に変更して計測（画面外で不可視）
+        restores.push({
+          el: p,
+          display: p.style.display,
+          visibility: p.style.visibility,
+          position: p.style.position,
+          left: p.style.left,
+          height: p.style.height
+        });
+        p.style.display = 'flex';
+        p.style.visibility = 'hidden';
+        p.style.position = 'absolute';
+        p.style.left = '-9999px';
+        // CSS変数による固定高さの影響を避けて自然高さを計測
+        p.style.height = 'auto';
+        const h = p.offsetHeight;
+        if (h > maxH) maxH = h;
+      });
+      // 元に戻す
+      restores.forEach(r => {
+        r.el.style.display = r.display;
+        r.el.style.visibility = r.visibility;
+        r.el.style.position = r.position;
+        r.el.style.left = r.left;
+        r.el.style.height = r.height;
+      });
+      if (maxH > 0) {
+        document.documentElement.style.setProperty('--page-fixed-height', `${maxH}px`);
+      }
     }
 
     function initialize() {
@@ -532,6 +589,8 @@
         pages.push(pageElement);
       });
       switchMode(currentMode, true);
+      // 初期表示後に高さを計測・固定
+      setTimeout(computeFixedPageHeight, 0);
       playBtn.addEventListener('click', playAudio);
       pauseBtn.addEventListener('click', pauseAudio);
       audio.addEventListener('timeupdate', handleTimeUpdate);
@@ -552,6 +611,7 @@
       currentActivePage = null;
       Object.values(modeButtons).forEach(btn => btn.classList.remove('active'));
       if (modeButtons[mode]) modeButtons[mode].classList.add('active');
+
       const newAudioSrc = audioFiles[mode];
       const currentFileName = audio.currentSrc.substring(audio.currentSrc.lastIndexOf('/') + 1);
       const newFileName = newAudioSrc.substring(newAudioSrc.lastIndexOf('/') + 1);
@@ -565,12 +625,14 @@
         pauseBtn.disabled = true;
         console.log(`Audio source set to: ${newAudioSrc}`);
       }
+
       const firstPageOfMode = pages.find(p => p.dataset.section === mode);
       pages.forEach(p => {
         p.style.display = 'none';
         p.classList.remove('active');
-        p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')); // ★ 修正
+        p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
       });
+
       if (firstPageOfMode) {
         firstPageOfMode.style.display = 'flex';
         firstPageOfMode.classList.add('active');
@@ -579,10 +641,23 @@
       } else {
         console.warn("No pages found for mode:", mode);
       }
+
       highlightVerse(0);
       updateActivePage(null);
-      showImage(0); // モード切替時に初期画像を表示
+      showImage(0);
+
+      // モード切替後に高さを再計測
+      setTimeout(computeFixedPageHeight, 0);
     }
+
+    // リサイズ時は少し間引いて再計測
+    let _resizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (_resizeTimer) clearTimeout(_resizeTimer);
+      _resizeTimer = setTimeout(() => {
+        computeFixedPageHeight();
+      }, 150);
+    });
 
     function showImage(index) {
       if (index === currentImageIndex) return; // 同じ画像なら何もしない
@@ -594,9 +669,8 @@
         scriptureImage.alt = imageName.replace('.png', '');
         currentImageIndex = index;
       } else {
-        // 画像リストの範囲外の場合は画像を非表示
-        scriptureImage.src = "";
-        scriptureImage.alt = "";
+        scriptureImage.src = '';
+        scriptureImage.alt = '';
         currentImageIndex = -1;
       }
     }
