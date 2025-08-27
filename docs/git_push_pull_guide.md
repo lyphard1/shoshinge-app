@@ -105,3 +105,113 @@
 
 ---
 このガイドは `docs/git_push_pull_guide.md` にあります。運用方針に合わせて随時更新してください。
+
+## Pull Request（PR）運用の要点（推奨）
+- ブランチ命名: `feature/<概要>`, `fix/<概要>`, `chore/<概要>`
+- 小さく頻繁にPR（レビューしやすく、コンフリクトを減らす）
+- マージ戦略: Squash merge（履歴を1コミットに集約） or Rebase merge（直線化）
+- PR説明テンプレ（例）
+  - 目的/背景
+  - 変更点（UI/仕様差分、影響範囲）
+  - 動作確認手順（スクショ/動画/URL）
+  - リスク・懸念点（必要なら）
+
+## Pre-push チェックリスト（手動）
+1) `git status -sb`（未コミット/未追跡ファイルの確認）
+2) `git fetch --prune` → `git pull --rebase`（behind 解消）
+3) ドキュメント更新（README/CHANGELOG/スクショ）
+4) バイナリや一時ファイルが混ざっていないか再確認（.gitignore 対応）
+5) ローカルで動作確認（最低限のスモークテスト）
+
+（任意）Git hooks で自動化: pre-commit でフォーマット/Spellチェック、pre-push で簡易テストを実行
+
+## 大容量ファイル対策: Git LFS（任意）
+音声・画像などが増える場合は LFS を検討。
+
+```bash
+# 初期設定（マシン1回）
+brew install git-lfs  # macOS（Homebrew）
+git lfs install
+
+# このリポジトリで LFS 対象を登録
+git lfs track "audio/*.mp3"
+git lfs track "audio/*.m4a"
+git lfs track "image/*.png"
+
+# ルートに .gitattributes が作成/更新されるのでコミット
+git add .gitattributes
+git commit -m "chore: enable Git LFS for audio and images"
+```
+
+注意:
+- 既にGitにフルで履歴追加された大きいファイルは、履歴から除去しない限り容量は減らない（`git filter-repo` 等が必要）。
+- LFS はGitHub側でも有料クォータ考慮が必要な場合あり。
+
+## .gitignore と .gitattributes の例
+`.gitignore`（提案）:
+```
+# macOS
+.DS_Store
+
+# エディタ/一時
+.vscode/
+*.log
+*.tmp
+*.bak
+~$*
+
+# ビルド/出力（該当する場合）
+dist/
+build/
+
+# 生成されるバックアップHTMLがあればパターン化
+*backup*.html
+```
+
+`.gitattributes`（行末/EOL・LFS）:
+```
+# テキストはLFに正規化
+* text=auto eol=lf
+
+# 画像・音声をLFSで管理（導入時のみ有効）
+image/*.png filter=lfs diff=lfs merge=lfs -text
+audio/*.mp3 filter=lfs diff=lfs merge=lfs -text
+audio/*.m4a filter=lfs diff=lfs merge=lfs -text
+```
+
+## 誤操作からの復旧テクニック
+- 直近の状態に戻る（履歴全体）
+  - `git reflog` で「戻りたいHEAD」を探す
+  - `git reset --hard <reflogで選んだハッシュ>`
+
+- 1ファイルだけ戻す
+  - `git restore --source=<コミットやブランチ> -- path/to/file`
+
+- 進行中の操作をやめる
+  - rebase をやめる: `git rebase --abort`
+  - merge をやめる: `git merge --abort`
+
+## 強制 push の注意
+- 極力避ける。必要な場合は `--force-with-lease` を使用
+  - `git push --force-with-lease`
+  - 自分が想定していない他者の更新を上書きしにくい
+- 強制push前に、必ず `git fetch` と `git log --oneline --graph --decorate --all` で状況確認
+
+## 改行・文字コードの安定化
+- macOS/Unix では LF を既定に（上記 `.gitattributes` 参照）
+- エディタ設定でも改行=LF/UTF-8 を推奨
+- これにより「行末の違い」だけのノイズ差分を回避
+
+## 便利エイリアス例（任意設定）
+```bash
+git config --global alias.st "status -sb"
+git config --global alias.lg "log --oneline --graph --decorate --all"
+git config --global alias.co "checkout"
+git config --global alias.br "branch -vv"
+git config --global alias.cm "commit -m"
+```
+
+## 追加の安全策（任意）
+- コミット署名（GPG/SSH）: 改変検出に有効
+- `git pull --rebase --autostash`: 未コミットの変更があっても自動退避/復元
+- CI（GitHub Actions）で基本チェック（HTMLバリデーション/リンク切れ/簡易テスト）
