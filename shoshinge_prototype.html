@@ -4,12 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <title>正信偈アプリ (ルビ・ハイライト修正版)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: "Hiragino Mincho ProN", "MS Mincho", serif;
+      font-family: 'Noto Sans JP', 'Hiragino Mincho ProN', 'MS Mincho', serif;
       margin: 0;
-      padding: 20px;
-      background: white;
+      padding: 24px;
+      background: linear-gradient(135deg, #f7fafc 0%, #e3e6ec 100%);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -18,7 +19,12 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #2d3748;
+      letter-spacing: 0.05em;
+      text-shadow: 0 2px 8px #fff8, 0 1px 0 #fff;
     }
 
     #imageContainer {
@@ -37,11 +43,15 @@
     }
 
     #controlsContainer {
-      margin-bottom: 15px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background-color: #f8f8f8;
+      margin-bottom: 18px;
+      padding: 16px 18px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 12px 0 #0001;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     #modeSelector {
@@ -50,24 +60,30 @@
     }
 
     #modeSelector button {
-      margin: 0 5px;
-      padding: 8px 15px;
-      font-size: 16px;
+      margin: 0 7px;
+      padding: 10px 22px;
+      font-size: 1.1rem;
       cursor: pointer;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      border-radius: 4px;
-      transition: background-color 0.2s, border-color 0.2s;
+      border: 1.5px solid #cbd5e1;
+      background: linear-gradient(180deg, #f8fafc 60%, #e2e8f0 100%);
+      border-radius: 6px;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 4px #0001;
+      font-weight: 500;
     }
 
     #modeSelector button:hover {
-      background-color: #eee;
+      background: #e2e8f0;
+      border-color: #a0aec0;
+      box-shadow: 0 2px 8px #0002;
     }
 
     #modeSelector button.active {
       font-weight: bold;
-      background-color: #e0e0e0;
-      border-color: #bbb;
+      background: linear-gradient(180deg, #cbd5e1 60%, #a0aec0 100%);
+      border-color: #4a5568;
+      color: #2d3748;
+      box-shadow: 0 2px 12px #0002;
     }
 
     #playbackControls {
@@ -77,39 +93,47 @@
     }
 
     #playbackControls button {
-      padding: 5px 10px;
-      font-size: 18px;
+      padding: 7px 0;
+      font-size: 20px;
       cursor: pointer;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      border-radius: 4px;
-      width: 40px;
+      border: 1.5px solid #cbd5e1;
+      background: linear-gradient(180deg, #f8fafc 60%, #e2e8f0 100%);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
       text-align: center;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 4px #0001;
     }
 
     #playbackControls button:hover {
-      background-color: #eee;
+      background: #e2e8f0;
+      border-color: #a0aec0;
+      box-shadow: 0 2px 8px #0002;
     }
 
     #playbackControls button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      background: #f1f5f9;
     }
 
     #progressBarContainer {
       flex-grow: 1;
-      height: 12px;
-      background: #ccc;
-      border-radius: 6px;
+      height: 14px;
+      background: #e2e8f0;
+      border-radius: 7px;
       overflow: hidden;
       cursor: pointer;
       position: relative;
+      margin: 0 10px;
+      box-shadow: 0 1px 4px #0001;
     }
 
     #progressBar {
       width: 0%;
       height: 100%;
-      background: #4caf50;
+      background: linear-gradient(90deg, #38b2ac 0%, #4299e1 100%);
       transition: width 0.1s linear;
     }
 
@@ -118,7 +142,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 300px;
+      min-height: 320px;
+      margin-top: 18px;
     }
 
     .page {
@@ -130,62 +155,61 @@
       justify-content: space-evenly;
       height: 75vh;
       max-height: 600px;
-      width: 90%;
-      max-width: 500px;
-      font-size: 26px;
-      /* 親文字のサイズ */
-      padding: 20px;
-      border: 1px solid #eee;
-      border-radius: 5px;
+      width: 92%;
+      max-width: 520px;
+      font-size: 28px;
+      padding: 28px 24px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
       box-sizing: border-box;
+      background: #fff;
+      box-shadow: 0 2px 16px #0001;
     }
 
     .page.active {
       display: flex;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: none; }
     }
 
     .verse {
-      padding: 8px 0;
-      border-radius: 3px;
+      padding: 10px 0;
+      border-radius: 5px;
       text-align: center;
-      line-height: 1.8;
+      line-height: 1.9;
       cursor: pointer;
-      transition: background-color 0.2s ease;
-      /* display: flex; */
-      /* 中央揃えのために追加したものを一旦コメントアウト */
-      /* flex-direction: column; */
-      /* justify-content: center; */
-      /* align-items: center; */
-      /* min-height: calc(26px * 7 * 1.2); */
-      /* 長さ調整も一旦コメントアウト */
+      transition: background 0.2s, color 0.2s;
+      font-weight: 400;
     }
 
     .verse:hover {
-      background-color: #f0f0f0;
+      background: #e6fffa;
+      color: #285e61;
     }
 
     .verse ruby {
       display: ruby;
       line-height: 1;
       text-align: center;
+      font-family: 'Noto Sans JP', 'Hiragino Mincho ProN', 'MS Mincho', serif;
     }
 
     .verse rt {
       font-size: 0.5em;
-      color: #333;
+      color: #4a5568;
       ruby-position: over;
       ruby-align: center;
     }
 
     /* ▼▼▼ ハイライトのスタイルを修正 ▼▼▼ */
     .verse.highlight ruby rb {
-      /* .verse に .highlight が付いた場合、その中の <rb> の背景を変える */
-      background-color: #ffeb3b;
-      padding: 1px 3px;
-      /* パディングを少し調整 */
-      border-radius: 3px;
-      /* display: inline; */
-      /* displayプロパティは<rb>のデフォルトに任せるか、必要なら調整 */
+      background: linear-gradient(90deg, #fffde4 0%, #ffe9b3 100%);
+      padding: 2px 5px;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px #0001;
     }
 
     /* ▲▲▲ ハイライトのスタイルを修正 ▲▲▲ */
