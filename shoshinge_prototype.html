@@ -10,7 +10,7 @@
       font-family: 'Noto Sans JP', 'Hiragino Mincho ProN', 'MS Mincho', serif;
       margin: 0;
       padding: 24px;
-      background: linear-gradient(135deg, #f7fafc 0%, #e3e6ec 100%);
+      background: linear-gradient(135deg, #f7fafc 0%, #c2e9fb 50%, #81a4fd 100%);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -89,7 +89,7 @@
     #playbackControls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
     }
 
     #playbackControls button {
@@ -120,14 +120,15 @@
 
     #progressBarContainer {
       flex-grow: 1;
-      height: 14px;
+      min-width: 320px;
+      height: 18px;
       background: #e2e8f0;
-      border-radius: 7px;
+      border-radius: 9px;
       overflow: hidden;
       cursor: pointer;
       position: relative;
       margin: 0 10px;
-      box-shadow: 0 1px 4px #0001;
+      box-shadow: 0 1.5px 6px #0001;
     }
 
     #progressBar {
@@ -142,8 +143,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 320px;
-      margin-top: 18px;
+      min-height: 220px;
+      margin-top: 6px;
     }
 
     .page {
@@ -153,12 +154,12 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-evenly;
-      height: 75vh;
-      max-height: 600px;
+      height: 52vh;
+      max-height: 420px;
       width: 92%;
       max-width: 520px;
       font-size: 28px;
-      padding: 28px 24px;
+      padding: 2px 10px;
       border: 1.5px solid #e2e8f0;
       border-radius: 14px;
       box-sizing: border-box;
@@ -170,9 +171,17 @@
       display: flex;
       animation: fadeIn 0.5s;
     }
+
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: none; }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
     }
 
     .verse {
