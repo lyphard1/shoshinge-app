@@ -60,15 +60,20 @@
       padding: 10px 22px;
       font-size: 1.05rem;
       cursor: pointer;
-      color: #fff;
-      border: none;
+      color: var(--text);
+      border: 1px solid #e2e8f0;
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--brand2) 0%, var(--brand) 100%);
-      box-shadow: 0 2px 8px #0002;
+      background: #f7fafc;
+      box-shadow: 0 2px 8px #0001;
+      transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
     }
 
     #modeSelector button.active {
-      outline: 3px solid #90cdf4;
+      color: #fff;
+      border: none;
+      background: linear-gradient(90deg, var(--brand2) 0%, var(--brand) 100%);
+      box-shadow: 0 3px 10px #0002;
+      outline: none;
     }
 
     #playbackControls {
@@ -159,10 +164,8 @@
     }
 
     .verse .char.highlight-char {
-      color: #111;
-      background: #ffeb3b;
-      border-radius: 3px;
-      box-shadow: 0 0 0 2px #ffeb3b;
+      color: #007bff; /* 文字の青ハイライト */
+      background: transparent;
     }
 
     /* 句ブロックの見た目（軽微に） */
