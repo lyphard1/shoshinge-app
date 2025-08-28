@@ -1,6 +1,5 @@
-shoshinge.mp3
-shoshinge.mp3
-audio/shoshinge.m4a
-audio/shoshinge.m4a
-audio/nenbutuwasan.mp3
-audio/nenbutuwasan.m4a
+# Ignore only repository-root audio assets, not docs/audio
+/audio/shoshinge.m4a
+/audio/nenbutuwasan.m4a
+/audio/nenbutuwasan.mp3
+/audio/shoshinge.mp3
