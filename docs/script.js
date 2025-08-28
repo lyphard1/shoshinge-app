@@ -4,6 +4,8 @@
 // DOM要素の取得
 const audioElement = document.createElement('audio');
 audioElement.id = 'audio';
+// 初期表示で大きな音声データを全取得しない（メタデータのみ取得）
+audioElement.preload = 'metadata';
 document.body.appendChild(audioElement);
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
@@ -45,10 +47,10 @@ const imageFiles = {
 
 // 音声ファイルリスト（モード別）
 // 備考: 絶対パスだと Live Server で 404 になるため、docs を基準にした相対パスに統一
-    const audioFiles = {
-      shoshinge: 'audio/shoshinge.mp3',
-      wasan: 'audio/nenbutuwasan.mp3'
-    };// 正信偈と念仏和讃のデータ（タイムコード付き）
+const audioFiles = {
+  shoshinge: 'audio/shoshinge.mp3',
+  wasan: 'audio/nenbutuwasan.mp3'
+};// 正信偈と念仏和讃のデータ（タイムコード付き）
 const originalPagesData = [
   // --- 正信偈 (shoshinge) ---
   {
@@ -122,10 +124,10 @@ function createPageElement(pageData) {
     verseDiv.dataset.start = verseData.start;
     verseDiv.dataset.end = verseData.end;
 
-  const rubyElement = document.createElement('ruby');
-  // 一部ブラウザで <rb> の扱いが不安定なため、span.rb を使用
-  const rbElement = document.createElement('span');
-  rbElement.classList.add('rb');
+    const rubyElement = document.createElement('ruby');
+    // 一部ブラウザで <rb> の扱いが不安定なため、span.rb を使用
+    const rbElement = document.createElement('span');
+    rbElement.classList.add('rb');
     // 一文字ずつspan化（後でchar単位でハイライト）
     const text = verseData.text || '';
     for (let i = 0; i < text.length; i++) {
@@ -277,7 +279,7 @@ function highlightVerse(currentTime) {
     const verseEnd = parseFloat(highlightedVerseElement.dataset.end);
     const verseDuration = verseEnd - verseStart;
     const elapsedTime = currentTime - verseStart;
-  const chars = Array.from(highlightedVerseElement.querySelectorAll('.rb .char'));
+    const chars = Array.from(highlightedVerseElement.querySelectorAll('.rb .char'));
     if (chars.length > 0 && verseDuration > 0) {
       const charDuration = verseDuration / chars.length;
       let charIndex = Math.floor(elapsedTime / charDuration);
