@@ -80,7 +80,12 @@ const originalPagesData = [
   { section: 'shoshinge', verses: [{ start: 434.9, end: 440.8, text: '広由本願力回向', ruby: 'こうゆほんがんりきえこう' }, { start: 440.8, end: 447.1, text: '為度群生彰一心', ruby: 'いどぐんじょうしょういっしん' }, { start: 447.1, end: 453.1, text: '帰入功徳大宝海', ruby: 'きにゅうくどくだいほうかい' }, { start: 453.1, end: 459.2, text: '必獲入大会衆数', ruby: '筆逆にゅうだいえしゅしゅう' }] },
   { section: 'shoshinge', verses: [{ start: 459.2, end: 465.2, text: '得至蓮華蔵世界', ruby: 'とくしれんげぞうせいかい' }, { start: 465.2, end: 471.2, text: '即証真如法性身', ruby: 'そくしょうしんにょほっしょうじん' }, { start: 471.2, end: 477.2, text: '遊煩悩林現神通', ruby: 'ゆうぼんのうりんげんじんずう' }, { start: 477.2, end: 483.1, text: '入生死園示応化', ruby: 'にゅうしょうじおんじおうげ' }] },
   { section: 'shoshinge', verses: [{ start: 483.1, end: 489.1, text: '本師曇鸞梁天子', ruby: 'ほんしげんくうみょうぶっきょう' }, { start: 489.1, end: 495.3, text: '常向鸞処菩薩礼', ruby: 'じょうこうらんしょぼさつらい' }, { start: 495.3, end: 501.3, text: '三蔵流支授浄教', ruby: 'さんぞうるしじゅじょうきょう' }, { start: 501.3, end: 507.2, text: '焚焼仙経帰楽邦', ruby: 'ぼんじょうせんぎょうきらくほう' }] },
-  { section: 'shoshinge', verses: [{ start: 507.2, end: 513.2, text: '天親菩薩論註解', ruby: 'てんじんぼつさろんちゅうげ' }, { start: 519.2, end: 525.1, text: '正定之因唯信心', ruby: 'しょうじょうしいんゆいしんじん' }] },
+  { section: 'shoshinge', verses: [
+    { start: 507.2, end: 513.2, text: '天親菩薩論註解', ruby: 'てんじんぼつさろんちゅうげ' },
+    { start: 513.2, end: 516.2, text: '報土因果顕誓願', ruby: '' },
+    { start: 516.2, end: 519.2, text: '往還回向由他力', ruby: '' },
+    { start: 519.2, end: 525.1, text: '正定之因唯信心', ruby: 'しょうじょうしいんゆいしんじん' }
+  ] },
   { section: 'shoshinge', verses: [{ start: 525.1, end: 531.1, text: '惑染凡夫信心発', ruby: 'わくぜんぼんぶしんじんぽつ' }, { start: 531.1, end: 537.1, text: '証知生死即涅槃', ruby: 'しょうちしょうじそくねはん' }, { start: 537.1, end: 543.2, text: '必至無量光明土', ruby: 'ひっしむりょうこうみょうど' }, { start: 543.2, end: 549.3, text: '諸有衆生皆普化', ruby: 'しょうしゅじょうかいふけ' }] },
   { section: 'shoshinge', verses: [{ start: 549.3, end: 555.3, text: '道綽決聖道難証', ruby: 'どうしゃっけっしょうどうなんしょう' }, { start: 555.3, end: 561.3, text: '唯明浄土可通入', ruby: 'ゆいみょうじょうどかつうにゅう' }, { start: 561.3, end: 567.5, text: '万善自力貶勤修', ruby: 'まんぜんじりきへんごんしゅう' }, { start: 567.5, end: 573.6, text: '円満徳号勧専称', ruby: 'えんまんとくごうかんせんしょう' }] },
   { section: 'shoshinge', verses: [{ start: 573.6, end: 579.5, text: '三不三信誨慇懃', ruby: 'さんぷさんしんけおんごん' }, { start: 579.5, end: 585.3, text: '像末法滅同悲引', ruby: 'ぞうまつほうめつどうひいん' }, { start: 585.3, end: 591.5, text: '一生造悪値弘誓', ruby: 'いっしょうぞうあくちぐぜい' }, { start: 591.5, end: 597.8, text: '至安養界証妙果', ruby: 'しあんにょうがいしょうみょうか' }] },
@@ -101,15 +106,35 @@ const originalPagesData = [
   { section: 'wasan', verses: [{ start: 215.5, end: 223.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 223.3, end: 231.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 231.3, end: 239, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 239, end: 246.7, text: '南無', ruby: 'なも' }] },
   { section: 'wasan', verses: [{ start: 246.7, end: 256.7, text: '阿弥陀仏', ruby: 'あみだーんぶ' }, { start: 256.7, end: 264.5, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 264.5, end: 272, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 272, end: 280.4, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
   { section: 'wasan', verses: [{ start: 280.4, end: 288.4, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 288.4, end: 296.4, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 296.4, end: 304.4, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 304.4, end: 312.4, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
-  { section: 'wasan', verses: [{ start: 312.4, end: 330.2, text: '解脱の光輪きはもなく', ruby: 'げだつのこうりんきはもなく' }, { start: 330.2, end: 343.3, text: '世の盲冥をてらすなり', ruby: 'せのもうみょうをてらすなり' }, { start: 343.3, end: 355.6, text: '智慧の光明はかりなし', ruby: 'ちえのこうみょうはかりなし' }, { start: 355.6, end: 367.9, text: '有量の諸相ことごとく', ruby: 'うりょうのしょそうことごとく' }] },
+  { section: 'wasan', verses: [
+    { start: 312.4, end: 330.2, text: '解脱の光輪きはもなし', ruby: '' },
+    { start: 330.2, end: 343.3, text: '光触かぶるものはみな', ruby: '' },
+    { start: 343.3, end: 355.6, text: '有無をはなるとのべたまふ', ruby: '' },
+    { start: 355.6, end: 367.9, text: '平等覚に帰命せよ', ruby: '' }
+  ] },
   { section: 'wasan', verses: [{ start: 367.9, end: 375.7, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 375.7, end: 383.7, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 383.7, end: 391.7, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 391.7, end: 399.7, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
-  { section: 'wasan', verses: [{ start: 399.7, end: 417.5, text: '光雲無碍如虚空', ruby: 'こううんむげにょくう' }, { start: 417.5, end: 430.6, text: '世の盲冥をてらすなり', ruby: 'せのもうみょうをてらすなり' }, { start: 430.6, end: 442.9, text: '智慧の光明はかりなし', ruby: 'ちえのこうみょうはかりなし' }, { start: 442.9, end: 455.2, text: '有量の諸相ことごとく', ruby: 'うりょうのしょそうことごとく' }] },
+  { section: 'wasan', verses: [
+    { start: 399.7, end: 417.5, text: '光雲無碍如虚空', ruby: '' },
+    { start: 417.5, end: 430.6, text: '一切の有碍にさはりなし', ruby: '' },
+    { start: 430.6, end: 442.9, text: '光沢かぶらぬものぞなき', ruby: '' },
+    { start: 442.9, end: 455.2, text: '難思議を帰命せよ', ruby: '' }
+  ] },
   { section: 'wasan', verses: [{ start: 455.2, end: 463, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 463, end: 471, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 471, end: 479, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 479, end: 487, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
   { section: 'wasan', verses: [{ start: 487, end: 495, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 495, end: 503, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 503, end: 511, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 511, end: 519, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
-  { section: 'wasan', verses: [{ start: 519, end: 536.8, text: '清浄光明ならびなし', ruby: 'しょうじょうこうみょうならびなし' }, { start: 536.8, end: 549.9, text: '世の盲冥をてらすなり', ruby: 'せのもうみょうをてらすなり' }, { start: 549.9, end: 562.2, text: '智慧の光明はかりなし', ruby: 'ちえのこうみょうはかりなし' }, { start: 562.2, end: 574.5, text: '有量の諸相ことごとく', ruby: 'うりょうのしょそうことごとく' }] },
+  { section: 'wasan', verses: [
+    { start: 519, end: 536.8, text: '清浄光明ならびなし', ruby: '' },
+    { start: 536.8, end: 549.9, text: '遇斯光のゆえなれば', ruby: '' },
+    { start: 549.9, end: 562.2, text: '一切の業繋ものぞこりぬ', ruby: '' },
+    { start: 562.2, end: 574.5, text: '畢竟依を帰命せよ', ruby: '' }
+  ] },
   { section: 'wasan', verses: [{ start: 574.5, end: 582.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 582.3, end: 590.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 590.3, end: 598.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 598.3, end: 606.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
   { section: 'wasan', verses: [{ start: 606.3, end: 614.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 614.3, end: 622.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 622.3, end: 630.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 630.3, end: 638.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
-  { section: 'wasan', verses: [{ start: 638.3, end: 656.1, text: '佛光照曜最第一', ruby: 'ぶつこうしょうようさいだいいち' }, { start: 656.1, end: 669.2, text: '世の盲冥をてらすなり', ruby: 'せのもうみょうをてらすなり' }, { start: 669.2, end: 681.5, text: '智慧の光明はかりなし', ruby: 'ちえのこうみょうはかりなし' }, { start: 681.5, end: 693.8, text: '有量の諸相ことごとく', ruby: 'うりょうのしょそうことごとく' }] },
+  { section: 'wasan', verses: [
+    { start: 638.3, end: 656.1, text: '佛光照曜最第一', ruby: '' },
+    { start: 656.1, end: 669.2, text: '光炎王仏となづけたり', ruby: '' },
+    { start: 669.2, end: 681.5, text: '三塗の黒闇ひらくなり', ruby: '' },
+    { start: 681.5, end: 693.8, text: '大応供を帰命せよ', ruby: '' }
+  ] },
   { section: 'wasan', verses: [{ start: 693.8, end: 701.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 701.6, end: 709.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 709.6, end: 717.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 717.6, end: 725.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] }
 ];
 
