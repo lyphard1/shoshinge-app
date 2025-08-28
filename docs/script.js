@@ -44,9 +44,10 @@ const imageFiles = {
 };
 
 // 音声ファイルリスト（モード別）
+// 備考: 絶対パスだと Live Server で 404 になるため、docs を基準にした相対パスに統一
     const audioFiles = {
-      shoshinge: '/shoshinge-app/audio/shoshinge.mp3',
-      wasan: '/shoshinge-app/audio/nenbutuwasan.mp3'
+      shoshinge: 'audio/shoshinge.mp3',
+      wasan: 'audio/nenbutuwasan.mp3'
     };// 正信偈と念仏和讃のデータ（タイムコード付き）
 const originalPagesData = [
   // --- 正信偈 (shoshinge) ---
