@@ -523,8 +523,45 @@ function handleProgressBarClick(e) {
   if (isFinite(newTime)) {
     audioElement.currentTime = newTime;
     console.log(`Seeked to: ${newTime.toFixed(2)}s`);
-    const highlightedVerseElement = highlightVerse(getEffectiveTime(audioElement.currentTime));
-    updateActivePage(highlightedVerseElement);
+    const effTime = getEffectiveTime(audioElement.currentTime);
+    const highlightedVerseElement = highlightVerse(effTime);
+    // ハイライトが取れない（無音区間など）場合でも、時間に合うページへ即時切り替え
+    if (!highlightedVerseElement) {
+      const pagesOfMode = pages.filter(p => p.dataset.section === currentMode);
+      let targetPage = null;
+      let targetIndex = -1;
+      for (let i = 0; i < pagesOfMode.length; i++) {
+        const p = pagesOfMode[i];
+        const verses = p.querySelectorAll('.verse');
+        if (verses.length === 0) continue;
+        const firstStart = parseFloat(verses[0].dataset.start);
+        const lastEnd = parseFloat(verses[verses.length - 1].dataset.end);
+        if (!isNaN(firstStart) && !isNaN(lastEnd) && effTime >= firstStart && effTime < lastEnd) {
+          targetPage = p;
+          targetIndex = i;
+          break;
+        }
+      }
+      if (targetPage) {
+        pages.forEach(p => {
+          if (p === targetPage) {
+            if (!p.classList.contains('active')) {
+              p.style.display = 'flex';
+              p.classList.add('active');
+            }
+            currentActivePage = p;
+          } else {
+            p.style.display = 'none';
+            p.classList.remove('active');
+          }
+        });
+        if (targetIndex >= 0) {
+          showImage(targetIndex);
+        }
+      }
+    } else {
+      updateActivePage(highlightedVerseElement);
+    }
     progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
   } else {
     console.warn("Cannot seek: Calculated time is not finite.", newTime);
