@@ -118,9 +118,9 @@
       background: #f1f5f9;
     }
 
-    #playbackControls button.active {
-      background: linear-gradient(180deg, #4299e1 60%, #3182ce 100%);
-      border-color: #2c5282;
+    #playbackControls button.mode-active {
+      background: linear-gradient(180deg, #38b2ac 60%, #2c7a7b 100%);
+      border-color: #234e52;
       color: white;
       box-shadow: 0 2px 12px #0003;
     }
@@ -232,6 +232,28 @@
     }
 
     /* ▲▲▲ ハイライトのスタイルを修正 ▲▲▲ */
+
+    /* 文字単位ハイライト用のスタイル */
+    .verse .char {
+      display: inline-block;
+      transition: background 0.3s ease, color 0.3s ease;
+      position: relative;
+    }
+
+    .verse .char.highlight-char {
+      color: #007bff;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      transform: none;
+      z-index: auto;
+      position: static;
+    }
+
+    .verse .char.highlight-char rt {
+      background: transparent;
+      color: #4a5568;
+    }
   </style>
 </head>
 
@@ -239,21 +261,20 @@
 
   <h1>正信偈・念仏和讃</h1>
 
-    <div id="controlsContainer">
-      <div id="modeSelector">
-        <button id="btn-shoshinge" onclick="switchMode('shoshinge')" class="active">正信偈</button>
-        <button id="btn-wasan" onclick="switchMode('wasan')">念仏和讃</button>
-      </div>
+  <div id="controlsContainer">
+    <div id="modeSelector">
+      <button id="btn-shoshinge" onclick="switchMode('shoshinge')" class="active">正信偈</button>
+      <button id="btn-wasan" onclick="switchMode('wasan')">念仏和讃</button>
+    </div>
 
-      <div id="playbackControls">
-        <button id="playBtn" title="再生">▶️</button>
-        <button id="pauseBtn" title="一時停止">⏸️</button>
-        <button id="sequentialBtn" title="順番ハイライト">🔄</button>
-        <div id="progressBarContainer" title="クリックして再生位置を変更">
-          <div id="progressBar"></div>
-        </div>
+    <div id="playbackControls">
+      <button id="playBtn" title="再生">▶️</button>
+      <button id="pauseBtn" title="一時停止">⏸️</button>
+      <div id="progressBarContainer" title="クリックして再生位置を変更">
+        <div id="progressBar"></div>
       </div>
-    </div>  <audio id="audio" src="audio/shoshinge.mp3"></audio>
+    </div>
+  </div> <audio id="audio" src="audio/shoshinge.mp3"></audio>
 
   <div id="pagesContainer"></div>
 
@@ -265,7 +286,6 @@
     const audio = document.getElementById('audio');
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
-    const sequentialBtn = document.getElementById('sequentialBtn');
     const progressBarContainer = document.getElementById('progressBarContainer');
     const progressBar = document.getElementById('progressBar');
     const pagesContainer = document.getElementById('pagesContainer');
@@ -279,9 +299,6 @@
     let pages = [];
     let currentActivePage = null;
     let currentImageIndex = -1;
-    let isSequentialMode = false; // 順番ハイライトモードのフラグ
-    let sequentialIndex = 0; // 順番ハイライトの現在のインデックス
-    let sequentialTimer = null; // 順番ハイライト用のタイマー
 
     // 画像ファイルマップ（クリーン版）
     const imageFiles = {
@@ -531,9 +548,30 @@
         verseDiv.dataset.end = verseData.end;
         const rubyElement = document.createElement('ruby');
         const rbElement = document.createElement('rb');
-        rbElement.textContent = verseData.text;
+
+        // 文字ごとにspan要素を作成
+        const text = verseData.text;
+        console.log(`Creating character elements for text: "${text}"`);
+        for (let i = 0; i < text.length; i++) {
+          const charSpan = document.createElement('span');
+          charSpan.classList.add('char');
+          charSpan.textContent = text[i];
+          charSpan.dataset.charIndex = i;
+          rbElement.appendChild(charSpan);
+          console.log(`Created main char element ${i}: "${text[i]}"`);
+        }
+
         const rtElement = document.createElement('rt');
-        rtElement.textContent = verseData.ruby || '';
+        const rubyText = verseData.ruby || '';
+        console.log(`Creating ruby character elements for ruby: "${rubyText}"`);
+        for (let i = 0; i < rubyText.length; i++) {
+          const rubyCharSpan = document.createElement('span');
+          rubyCharSpan.classList.add('char', 'char-ruby');
+          rubyCharSpan.textContent = rubyText[i];
+          rubyCharSpan.dataset.charIndex = i;
+          rtElement.appendChild(rubyCharSpan);
+          console.log(`Created ruby char element ${i}: "${rubyText[i]}"`);
+        }
         rubyElement.appendChild(rbElement);
         rubyElement.appendChild(rtElement);
         verseDiv.appendChild(rubyElement);
@@ -603,7 +641,6 @@
       setTimeout(computeFixedPageHeight, 0);
       playBtn.addEventListener('click', playAudio);
       pauseBtn.addEventListener('click', pauseAudio);
-      sequentialBtn.addEventListener('click', toggleSequentialMode);
       audio.addEventListener('timeupdate', handleTimeUpdate);
       audio.addEventListener('loadedmetadata', handleLoadedMetadata);
       audio.addEventListener('ended', handleAudioEnded);
@@ -612,16 +649,17 @@
       playBtn.disabled = false;
       pauseBtn.disabled = true;
       showImage(0); // 初期画像を表示
+
       console.log("Application initialized.");
+
+      // 初期化時に全てのハイライトを解除
+      clearAllHighlights();
+
+      console.log(`Initial state`);
     }
 
     function switchMode(mode, isInitialLoad = false) {
       if (!isInitialLoad && currentMode === mode) return;
-
-      // 順番ハイライトモードを停止
-      if (isSequentialMode) {
-        stopSequentialHighlight();
-      }
 
       console.log(`Switching mode to: ${mode}`);
       currentMode = mode;
@@ -694,14 +732,9 @@
 
     /**
      * 現在時刻に基づいて句をハイライトし、対応する画像を表示する
-     * 順番ハイライトモード時は動作しない
+     * 順番ハイライトモード時は文字単位でハイライト
      */
     function highlightVerse(currentTime) {
-      // 順番ハイライトモード時は通常のハイライトを行わない
-      if (isSequentialMode) {
-        return null;
-      }
-
       let highlightedVerseElement = null;
       let overallVerseIndex = -1;
       let currentPageIndex = -1;
@@ -727,10 +760,30 @@
       }
 
       // 全てのハイライトを一旦解除
-      pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
+      pages.forEach(p => {
+        p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
+        p.querySelectorAll('.char.highlight-char').forEach(c => c.classList.remove('highlight-char'));
+      });
 
       if (highlightedVerseElement) {
+        // 句をハイライト
         highlightedVerseElement.classList.add('highlight');
+
+        // 文字単位ハイライト
+        const verseStart = parseFloat(highlightedVerseElement.dataset.start);
+        const verseEnd = parseFloat(highlightedVerseElement.dataset.end);
+        const verseDuration = verseEnd - verseStart;
+        const elapsedTime = currentTime - verseStart;
+
+        // verse内の文字を収集（ふりがな除く）
+        const chars = Array.from(highlightedVerseElement.querySelectorAll('rb .char:not(.char-ruby)'));
+        if (chars.length > 0) {
+          const charDuration = verseDuration / chars.length;
+          const charIndex = Math.floor(elapsedTime / charDuration);
+          if (charIndex >= 0 && charIndex < chars.length) {
+            chars[charIndex].classList.add('highlight-char');
+          }
+        }
         // 画像を更新 (ページインデックスに基づいて切り替え)
         showImage(currentPageIndex);
       } else {
@@ -781,11 +834,6 @@
     }
 
     function playAudio() {
-      // 順番ハイライトモード時は停止
-      if (isSequentialMode) {
-        stopSequentialHighlight();
-      }
-
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.then(_ => {
@@ -797,99 +845,25 @@
     }
     function pauseAudio() { audio.pause(); playBtn.disabled = false; pauseBtn.disabled = true; console.log("Audio playback paused."); }
 
-    // 順番ハイライトモードの切り替え
-    function toggleSequentialMode() {
-      if (isSequentialMode) {
-        stopSequentialHighlight();
-      } else {
-        startSequentialHighlight();
-      }
-    }
-
-    // 順番ハイライトを開始
-    function startSequentialHighlight() {
-      if (isSequentialMode) return;
-
-      isSequentialMode = true;
-      sequentialIndex = 0;
-      sequentialBtn.classList.add('active');
-      sequentialBtn.title = '順番ハイライト停止';
-
-      // 音声再生を停止
-      audio.pause();
-      playBtn.disabled = false;
-      pauseBtn.disabled = true;
-
-      // 全てのハイライトを解除
-      pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
-
-      // 順番ハイライトを開始
-      highlightNextVerse();
-
-      console.log("Sequential highlight mode started.");
-    }
-
-    // 順番ハイライトを停止
-    function stopSequentialHighlight() {
-      if (!isSequentialMode) return;
-
-      isSequentialMode = false;
-      sequentialBtn.classList.remove('active');
-      sequentialBtn.title = '順番ハイライト';
-
-      if (sequentialTimer) {
-        clearTimeout(sequentialTimer);
-        sequentialTimer = null;
-      }
-
-      // 全てのハイライトを解除
-      pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
-
-      console.log("Sequential highlight mode stopped.");
-    }
-
-    // 次の句をハイライト
-    function highlightNextVerse() {
-      if (!isSequentialMode) return;
-
-      const pagesOfMode = pages.filter(p => p.dataset.section === currentMode);
-      const allVerses = [];
-
-      // 全ての句を順番に収集
-      pagesOfMode.forEach(page => {
-        const verses = Array.from(page.querySelectorAll('.verse'));
-        allVerses.push(...verses);
+    // 全てのハイライトを解除
+    function clearAllHighlights() {
+      console.log('clearAllHighlights: Starting to clear all highlights');
+      pages.forEach(p => {
+        p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
+        // rb要素内とrt要素内の.char要素のハイライトを解除
+        const highlightedChars = p.querySelectorAll('.char.highlight-char');
+        console.log(`clearAllHighlights: Found ${highlightedChars.length} highlighted characters to clear`);
+        highlightedChars.forEach(c => {
+          console.log(`clearAllHighlights: Removing highlight from: "${c.textContent}"`);
+          c.classList.remove('highlight-char');
+        });
       });
-
-      if (sequentialIndex >= allVerses.length) {
-        // 全ての句をハイライトし終わったら停止
-        stopSequentialHighlight();
-        return;
-      }
-
-      // 現在の句をハイライト
-      const currentVerse = allVerses[sequentialIndex];
-      const currentPage = currentVerse.closest('.page');
-      const pageIndex = pagesOfMode.indexOf(currentPage);
-
-      // 全てのハイライトを解除
-      pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
-
-      // 新しい句をハイライト
-      currentVerse.classList.add('highlight');
-
-      // ページを表示
-      updateActivePage(currentVerse);
-
-      // 画像を更新
-      showImage(pageIndex);
-
-      // 次の句へ
-      sequentialIndex++;
-
-      // 次のハイライトをスケジュール（2秒間隔）
-      sequentialTimer = setTimeout(highlightNextVerse, 2000);
+      console.log('clearAllHighlights: Finished clearing all highlights');
     }
+
+
+
+
     function handleTimeUpdate() { if (audio.duration) { progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%'; } const highlightedVerseElement = highlightVerse(audio.currentTime); updateActivePage(highlightedVerseElement); }
     function handleLoadedMetadata() { console.log("Audio metadata loaded. Duration:", audio.duration, "Src:", audio.currentSrc); progressBar.style.width = '0%'; playBtn.disabled = false; pauseBtn.disabled = true; }
     function handleAudioEnded() { console.log("Audio ended."); playBtn.disabled = false; pauseBtn.disabled = true; }
