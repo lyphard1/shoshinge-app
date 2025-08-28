@@ -146,11 +146,11 @@ function createPageElement(pageData) {
     verseDiv.appendChild(rubyElement);
 
     verseDiv.addEventListener('click', () => {
-      if (!isNaN(verseData.start) && audioElement.duration) {
+      if (!isNaN(verseData.start)) {
         audioElement.currentTime = verseData.start;
-        if (audioElement.paused) {
-          audioElement.play().catch(e => console.error("Error playing on verse click:", e));
-        }
+        // 停止中は自動再生しない。UIだけ即時反映
+        const highlighted = highlightVerse(audioElement.currentTime);
+        updateActivePage(highlighted);
       }
     });
 
@@ -342,6 +342,8 @@ function playAudio() {
     playPromise.then(_ => {
       playBtn.disabled = true;
       pauseBtn.disabled = false;
+      playBtn.classList.add('active');
+      pauseBtn.classList.remove('active');
       console.log("Audio playback started.");
     }).catch(error => {
       console.error("Audio playback failed:", error);
@@ -352,6 +354,8 @@ function playAudio() {
   } else {
     playBtn.disabled = true;
     pauseBtn.disabled = false;
+    playBtn.classList.add('active');
+    pauseBtn.classList.remove('active');
   }
 }
 
@@ -360,6 +364,8 @@ function pauseAudio() {
   audioElement.pause();
   playBtn.disabled = false;
   pauseBtn.disabled = true;
+  playBtn.classList.remove('active');
+  pauseBtn.classList.add('active');
   console.log("Audio playback paused.");
 }
 
@@ -378,6 +384,8 @@ function handleLoadedMetadata() {
   progressBar.style.width = '0%';
   playBtn.disabled = false;
   pauseBtn.disabled = true;
+  playBtn.classList.remove('active');
+  pauseBtn.classList.remove('active');
 }
 
 // 終了ハンドラー
@@ -385,6 +393,8 @@ function handleAudioEnded() {
   console.log("Audio ended.");
   playBtn.disabled = false;
   pauseBtn.disabled = true;
+  playBtn.classList.remove('active');
+  pauseBtn.classList.add('active');
 }
 
 // エラーハンドラー（強化）
