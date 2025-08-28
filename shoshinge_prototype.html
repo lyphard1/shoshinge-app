@@ -551,26 +551,22 @@
 
         // 文字ごとにspan要素を作成
         const text = verseData.text;
-        console.log(`Creating character elements for text: "${text}"`);
         for (let i = 0; i < text.length; i++) {
           const charSpan = document.createElement('span');
           charSpan.classList.add('char');
           charSpan.textContent = text[i];
           charSpan.dataset.charIndex = i;
           rbElement.appendChild(charSpan);
-          console.log(`Created main char element ${i}: "${text[i]}"`);
         }
 
         const rtElement = document.createElement('rt');
         const rubyText = verseData.ruby || '';
-        console.log(`Creating ruby character elements for ruby: "${rubyText}"`);
         for (let i = 0; i < rubyText.length; i++) {
           const rubyCharSpan = document.createElement('span');
           rubyCharSpan.classList.add('char', 'char-ruby');
           rubyCharSpan.textContent = rubyText[i];
           rubyCharSpan.dataset.charIndex = i;
           rtElement.appendChild(rubyCharSpan);
-          console.log(`Created ruby char element ${i}: "${rubyText[i]}"`);
         }
         rubyElement.appendChild(rbElement);
         rubyElement.appendChild(rtElement);
@@ -654,14 +650,11 @@
 
       // 初期化時に全てのハイライトを解除
       clearAllHighlights();
-
-      console.log(`Initial state`);
     }
 
     function switchMode(mode, isInitialLoad = false) {
       if (!isInitialLoad && currentMode === mode) return;
 
-      console.log(`Switching mode to: ${mode}`);
       currentMode = mode;
       currentActivePage = null;
       Object.values(modeButtons).forEach(btn => btn.classList.remove('active'));
@@ -678,7 +671,6 @@
         progressBar.style.width = '0%';
         playBtn.disabled = false;
         pauseBtn.disabled = true;
-        console.log(`Audio source set to: ${newAudioSrc}`);
       }
 
       const firstPageOfMode = pages.find(p => p.dataset.section === mode);
@@ -692,7 +684,6 @@
         firstPageOfMode.style.display = 'flex';
         firstPageOfMode.classList.add('active');
         currentActivePage = firstPageOfMode;
-        console.log("Showing first page of mode:", mode);
       } else {
         console.warn("No pages found for mode:", mode);
       }
@@ -731,8 +722,7 @@
     }
 
     /**
-     * 現在時刻に基づいて句をハイライトし、対応する画像を表示する
-     * 順番ハイライトモード時は文字単位でハイライト
+     * 現在時刻に基づいて句と文字をハイライトし、対応する画像を表示する
      */
     function highlightVerse(currentTime) {
       let highlightedVerseElement = null;
@@ -837,38 +827,103 @@
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.then(_ => {
-          playBtn.disabled = true; pauseBtn.disabled = false; console.log("Audio playback started.");
+          playBtn.disabled = true;
+          pauseBtn.disabled = false;
         }).catch(error => {
-          console.error("Audio playback failed:", error); alert("音声の再生を開始できませんでした。"); playBtn.disabled = false; pauseBtn.disabled = true;
+          console.error("Audio playback failed:", error);
+          alert("音声の再生を開始できませんでした。");
+          playBtn.disabled = false;
+          pauseBtn.disabled = true;
         });
-      } else { playBtn.disabled = true; pauseBtn.disabled = false; }
+      } else {
+        playBtn.disabled = true;
+        pauseBtn.disabled = false;
+      }
     }
-    function pauseAudio() { audio.pause(); playBtn.disabled = false; pauseBtn.disabled = true; console.log("Audio playback paused."); }
+
+    function pauseAudio() {
+      audio.pause();
+      playBtn.disabled = false;
+      pauseBtn.disabled = true;
+    }
 
     // 全てのハイライトを解除
     function clearAllHighlights() {
-      console.log('clearAllHighlights: Starting to clear all highlights');
       pages.forEach(p => {
         p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
-        // rb要素内とrt要素内の.char要素のハイライトを解除
         const highlightedChars = p.querySelectorAll('.char.highlight-char');
-        console.log(`clearAllHighlights: Found ${highlightedChars.length} highlighted characters to clear`);
         highlightedChars.forEach(c => {
-          console.log(`clearAllHighlights: Removing highlight from: "${c.textContent}"`);
           c.classList.remove('highlight-char');
         });
       });
-      console.log('clearAllHighlights: Finished clearing all highlights');
     }
 
 
 
 
-    function handleTimeUpdate() { if (audio.duration) { progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%'; } const highlightedVerseElement = highlightVerse(audio.currentTime); updateActivePage(highlightedVerseElement); }
-    function handleLoadedMetadata() { console.log("Audio metadata loaded. Duration:", audio.duration, "Src:", audio.currentSrc); progressBar.style.width = '0%'; playBtn.disabled = false; pauseBtn.disabled = true; }
-    function handleAudioEnded() { console.log("Audio ended."); playBtn.disabled = false; pauseBtn.disabled = true; }
-    function handleAudioError(e) { console.error("Audio Error:", audio.error, "Src:", audio.currentSrc); const err = audio.error; let message = `音声ファイルの読み込み/再生に失敗しました。\nファイル: ${audio.currentSrc.split('/').pop()}`; if (err) { message += `\nエラーコード: ${err.code}`; switch (err.code) { case MediaError.MEDIA_ERR_ABORTED: message += ' (読み込み中止)'; break; case MediaError.MEDIA_ERR_NETWORK: message += ' (ネットワークエラー)'; break; case MediaError.MEDIA_ERR_DECODE: message += ' (デコードエラー)'; break; case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: message += ' (ファイル形式非対応/ファイルが見つからない)'; break; default: message += ' (不明なエラー)'; } } alert(message); playBtn.disabled = true; pauseBtn.disabled = true; }
-    function handleProgressBarClick(e) { if (!audio.duration || !isFinite(audio.duration)) { console.warn("Cannot seek: Audio duration not available or invalid."); return; } const rect = progressBarContainer.getBoundingClientRect(); const offsetX = e.clientX - rect.left; const newTime = (offsetX / rect.width) * audio.duration; if (isFinite(newTime)) { audio.currentTime = newTime; console.log(`Seeked to: ${newTime.toFixed(2)}s`); const highlightedVerseElement = highlightVerse(audio.currentTime); updateActivePage(highlightedVerseElement); progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%'; } else { console.warn("Cannot seek: Calculated time is not finite.", newTime); } }
+    function handleTimeUpdate() {
+      if (audio.duration) {
+        progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%';
+      }
+      const highlightedVerseElement = highlightVerse(audio.currentTime);
+      updateActivePage(highlightedVerseElement);
+    }
+
+    function handleLoadedMetadata() {
+      progressBar.style.width = '0%';
+      playBtn.disabled = false;
+      pauseBtn.disabled = true;
+    }
+
+    function handleAudioEnded() {
+      playBtn.disabled = false;
+      pauseBtn.disabled = true;
+    }
+
+    function handleAudioError(e) {
+      const err = audio.error;
+      let message = `音声ファイルの読み込み/再生に失敗しました。\nファイル: ${audio.currentSrc.split('/').pop()}`;
+      if (err) {
+        message += `\nエラーコード: ${err.code}`;
+        switch (err.code) {
+          case MediaError.MEDIA_ERR_ABORTED:
+            message += ' (読み込み中止)';
+            break;
+          case MediaError.MEDIA_ERR_NETWORK:
+            message += ' (ネットワークエラー)';
+            break;
+          case MediaError.MEDIA_ERR_DECODE:
+            message += ' (デコードエラー)';
+            break;
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            message += ' (ファイル形式非対応/ファイルが見つからない)';
+            break;
+          default:
+            message += ' (不明なエラー)';
+        }
+      }
+      alert(message);
+      playBtn.disabled = true;
+      pauseBtn.disabled = true;
+    }
+
+    function handleProgressBarClick(e) {
+      if (!audio.duration || !isFinite(audio.duration)) {
+        console.warn("Cannot seek: Audio duration not available or invalid.");
+        return;
+      }
+      const rect = progressBarContainer.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const newTime = (offsetX / rect.width) * audio.duration;
+      if (isFinite(newTime)) {
+        audio.currentTime = newTime;
+        const highlightedVerseElement = highlightVerse(audio.currentTime);
+        updateActivePage(highlightedVerseElement);
+        progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%';
+      } else {
+        console.warn("Cannot seek: Calculated time is not finite.", newTime);
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', initialize);
   </script>
