@@ -245,3 +245,183 @@ c14e317 - デザイン修正（UI改善）
 **記録日時**: 2025年8月27日  
 **セッション時間**: 約2時間  
 **次回レビュー予定**: 要相談
+
+---
+
+# 正信偈・念仏和讃アプリ 開発ログ (2025年8月28日)
+
+このドキュメントは、2025年8月28日の開発セッションで行われた改善作業の記録です。
+
+## 📋 セッション概要
+
+**実施日**: 2025年8月28日  
+**主な作業**: デザイン洗練、コード構造改善、エラーハンドリング強化、MP3ファイルダウンロード  
+**対象ファイル**: `shoshinge_prototype.html`, `script.js`
+
+---
+
+## 🎯 実施した改善項目
+
+### 1. デザインの洗練
+#### 問題
+- 基本的なデザインだが、よりモダンで洗練された見た目に改善したい
+- フォント、配色、ボタンのスタイルが古い印象
+
+#### 解決策
+- **Google Fonts導入**: Noto Sans JPを導入し、日本語フォントを統一
+- **配色改善**: グラデーション背景、落ち着いたカラーパレット（青系グレー）
+- **ボタン/コントロールのスタイルアップ**:
+  - シャドウ効果、ホバーアニメーション
+  - 角丸、グラデーション
+- **全体のレイアウト調整**: 余白、フォントサイズ、行間を最適化
+- **アニメーション追加**: ページ切り替え時のフェードイン効果
+
+#### 実装コード例
+```css
+body {
+  font-family: 'Noto Sans JP', 'Hiragino Mincho ProN', 'MS Mincho', serif;
+  background: linear-gradient(135deg, #f7fafc 0%, #e3e6ec 100%);
+}
+
+#controlsContainer {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 12px 0 #0001;
+}
+
+#modeSelector button {
+  background: linear-gradient(180deg, #f8fafc 60%, #e2e8f0 100%);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px #0001;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.page.active {
+  animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: none; }
+}
+```
+
+### 2. JavaScriptコードの分離と構造改善
+#### 問題
+- JSコードがHTMLファイル内に長く記述されており、可読性が低い
+- メンテナンスが困難
+
+#### 解決策
+- **JS分離**: HTMLからJS部分を抜き出し、`script.js`ファイルを作成
+- **コメント追加**: 各関数、変数に日本語コメントを追加
+- **コード整理**: 関数をグループ化し、役割ごとに整理
+
+#### 実装例
+```html
+<!-- HTMLファイル末尾 -->
+<script src="script.js"></script>
+```
+
+```javascript
+// 正信偈アプリのJavaScriptファイル
+// 音声再生、テキストハイライト、画像表示を管理
+
+// DOM要素の取得
+const audio = document.getElementById('audio');
+// ... コメント付きのコード
+```
+
+### 3. エラーハンドリングの強化
+#### 問題
+- 音声ファイルや画像ファイルが存在しない場合の処理が不十分
+- ユーザーにエラーがわかりにくい
+
+#### 解決策
+- **音声エラーハンドリング**: 詳細なエラーコード表示とメッセージ
+- **画像エラーハンドリング**: `onerror`イベントで代替処理
+- **ファイル存在確認**: ロード時にエラーをチェック
+
+#### 実装コード例
+```javascript
+// 画像表示関数（エラーハンドリング強化）
+function showImage(index) {
+  // ... 既存コード
+  scriptureImage.onerror = () => {
+    console.warn(`Image not found: ${imagePath}`);
+    scriptureImage.src = "";
+    scriptureImage.alt = "画像が見つかりません";
+  };
+}
+
+// 音声エラーハンドラー
+function handleAudioError(e) {
+  const err = audio.error;
+  let message = `音声ファイルの読み込み/再生に失敗しました。\nファイル: ${audio.currentSrc.split('/').pop()}`;
+  if (err) {
+    message += `\nエラーコード: ${err.code}`;
+    switch (err.code) {
+      case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+        message += ' (ファイル形式非対応/ファイルが見つからない)';
+        break;
+      // ... 他のケース
+    }
+  }
+  alert(message);
+  playBtn.disabled = true;
+  pauseBtn.disabled = true;
+}
+```
+
+### 4. MP3ファイルのダウンロード
+#### 問題
+- GitHubリポジトリに音声ファイルが存在せず、アプリが動作しない
+
+#### 解決策
+- **GitHubプル実行**: `git pull origin main` で最新状態を反映
+- **ファイル確認**: `audio/shoshinge.mp3` と `audio/nenbutuwasan.mp3` の存在を確認
+
+#### 結果
+- 正信偈用MP3: `audio/shoshinge.mp3` (約17MB)
+- 念仏和讃用MP3: `audio/nenbutuwasan.mp3` (約16MB)
+- アプリが正常に音声再生可能に
+
+---
+
+## 📊 改善結果
+
+### デザイン面
+- ✅ モダンで洗練されたUI
+- ✅ レスポンシブ対応維持
+- ✅ アクセシビリティ向上（フォント統一）
+
+### コード品質
+- ✅ 可読性大幅向上（JS分離、コメント追加）
+- ✅ メンテナンス性向上
+- ✅ エラーハンドリング強化
+
+### 機能面
+- ✅ 音声ファイル利用可能
+- ✅ 安定した動作
+
+---
+
+## 🔧 使用技術・ツール
+- **言語**: HTML, CSS, JavaScript
+- **フォント**: Google Fonts (Noto Sans JP)
+- **バージョン管理**: Git / GitHub
+- **開発環境**: VS Code
+
+---
+
+## 📁 変更ファイル一覧
+- `shoshinge_prototype.html`: デザイン洗練、JS参照変更
+- `script.js`: 新規作成（JSコード分離）
+- `audio/shoshinge.mp3`: GitHubからダウンロード
+- `audio/nenbutuwasan.mp3`: GitHubからダウンロード
+
+---
+
+**記録者**: GitHub Copilot  
+**記録日時**: 2025年8月28日  
+**セッション時間**: 約1.5時間  
+**次回レビュー予定**: 要相談
