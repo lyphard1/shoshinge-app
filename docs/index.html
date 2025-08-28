@@ -216,6 +216,13 @@
       <div id="progressBarContainer" title="クリックして再生位置を変更">
         <div id="progressBar"></div>
       </div>
+      <div id="timingAdjust" style="display:flex; align-items:center; gap:6px; margin-left:8px;">
+        <span style="font-size:0.9rem; color:#4a5568;">タイミング</span>
+        <button id="offsetMinusBtn" title="ハイライトを早める(-0.1s)">-0.1s</button>
+        <button id="offsetResetBtn" title="補正をリセット">±0</button>
+        <button id="offsetPlusBtn" title="ハイライトを遅らせる(+0.1s)">+0.1s</button>
+        <span id="offsetValue" style="min-width:4.5em; text-align:right; font-variant-numeric: tabular-nums; color:#2d3748;">0.0s</span>
+      </div>
     </div>
   </div>
 

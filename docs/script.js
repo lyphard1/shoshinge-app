@@ -17,17 +17,38 @@ const modeButtons = {
   shoshinge: document.getElementById('btn-shoshinge'),
   wasan: document.getElementById('btn-wasan')
 };
+// タイミング補正UI
+const offsetMinusBtn = document.getElementById('offsetMinusBtn');
+const offsetPlusBtn = document.getElementById('offsetPlusBtn');
+const offsetResetBtn = document.getElementById('offsetResetBtn');
+const offsetValueEl = document.getElementById('offsetValue');
 
 // グローバル変数
 let currentMode = 'shoshinge';
 let pages = [];
 let currentActivePage = null;
 let currentImageIndex = -1;
+// モード別のハイライト補正（秒）。音声に対して + はハイライトを遅らせる。
+const highlightOffset = {
+  shoshinge: 0,
+  wasan: 0
+};
+const OFFSET_STEP = 0.1; // 秒
+function getEffectiveTime(t) {
+  // 現在モードの補正を適用した時間を返す（ハイライト・ページ計算用）
+  const off = highlightOffset[currentMode] || 0;
+  const eff = t - off;
+  return eff < 0 ? 0 : eff;
+}
+function updateOffsetDisplay() {
+  const v = highlightOffset[currentMode] || 0;
+  offsetValueEl.textContent = `${v.toFixed(1)}s`;
+}
 
 // 画像ファイルリスト（モード別）
 const imageFiles = {
   shoshinge: [
-  "帰命無量寿如来.png", "覩見諸仏浄土因.png", "五劫思惟之摂受.png", "清浄歓喜智慧光.png",
+    "帰命無量寿如来.png", "覩見諸仏浄土因.png", "五劫思惟之摂受.png", "清浄歓喜智慧光.png",
     "本願名号正定業.png", "如来所以興出世.png", "能発一念喜愛心.png", "摂取心光常照護.png",
     "譬如日光覆雲霧.png", "一切善悪凡夫人.png", "弥陀仏本願念仏.png", "印度西天之論家.png",
     "釈迦如来楞伽山.png", "宣説大乗無上法.png", "憶念弥陀仏本願.png", "天親菩薩造論説.png",
@@ -211,6 +232,28 @@ function initialize() {
   audioElement.addEventListener('ended', handleAudioEnded);
   audioElement.addEventListener('error', handleAudioError);
   progressBarContainer.addEventListener('click', handleProgressBarClick);
+  // 補正ボタン
+  if (offsetMinusBtn && offsetPlusBtn && offsetResetBtn && offsetValueEl) {
+    offsetMinusBtn.addEventListener('click', () => {
+      highlightOffset[currentMode] = parseFloat((highlightOffset[currentMode] - OFFSET_STEP).toFixed(2));
+      updateOffsetDisplay();
+      const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
+      updateActivePage(highlighted);
+    });
+    offsetPlusBtn.addEventListener('click', () => {
+      highlightOffset[currentMode] = parseFloat((highlightOffset[currentMode] + OFFSET_STEP).toFixed(2));
+      updateOffsetDisplay();
+      const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
+      updateActivePage(highlighted);
+    });
+    offsetResetBtn.addEventListener('click', () => {
+      highlightOffset[currentMode] = 0;
+      updateOffsetDisplay();
+      const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
+      updateActivePage(highlighted);
+    });
+    updateOffsetDisplay();
+  }
   playBtn.disabled = false;
   pauseBtn.disabled = true;
   showImage(0);
@@ -252,7 +295,8 @@ function switchMode(mode, isInitialLoad = false) {
   } else {
     console.warn("No pages found for mode:", mode);
   }
-  highlightVerse(0);
+  updateOffsetDisplay();
+  highlightVerse(getEffectiveTime(0));
   updateActivePage(null);
   showImage(0);
 }
@@ -283,6 +327,7 @@ function showImage(index) {
 
 // ハイライト関数
 function highlightVerse(currentTime) {
+  // currentTime は補正済みの時間を渡す想定
   let highlightedVerseElement = null;
   let overallVerseIndex = -1;
   let currentPageIndex = -1;
@@ -294,7 +339,7 @@ function highlightVerse(currentTime) {
       const v = versesOnPage[j];
       const start = parseFloat(v.dataset.start);
       const end = parseFloat(v.dataset.end);
-      if (!isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
+  if (!isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
         highlightedVerseElement = v;
         currentPageIndex = i;
         break;
@@ -326,7 +371,7 @@ function highlightVerse(currentTime) {
     }
     showImage(currentPageIndex);
   } else {
-    if (audioElement.paused && audioElement.currentTime === 0) {
+  if (audioElement.paused && audioElement.currentTime === 0) {
       showImage(0);
     }
   }
@@ -409,7 +454,7 @@ function handleTimeUpdate() {
   if (audioElement.duration) {
     progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
   }
-  const highlightedVerseElement = highlightVerse(audioElement.currentTime);
+  const highlightedVerseElement = highlightVerse(getEffectiveTime(audioElement.currentTime));
   updateActivePage(highlightedVerseElement);
 }
 
@@ -473,7 +518,7 @@ function handleProgressBarClick(e) {
   if (isFinite(newTime)) {
     audioElement.currentTime = newTime;
     console.log(`Seeked to: ${newTime.toFixed(2)}s`);
-    const highlightedVerseElement = highlightVerse(audioElement.currentTime);
+  const highlightedVerseElement = highlightVerse(getEffectiveTime(audioElement.currentTime));
     updateActivePage(highlightedVerseElement);
     progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
   } else {
