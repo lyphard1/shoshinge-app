@@ -125,17 +125,17 @@
     }
 
     .page {
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  /* 縦書きレイアウト */
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  align-items: center;
-  justify-content: flex-start;
-  /* 見やすいサイズに調整 */
-  font-size: 28px;
-  padding: 2px 10px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      /* 縦書きレイアウト */
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      align-items: center;
+      justify-content: flex-start;
+      /* 見やすいサイズに調整 */
+      font-size: 28px;
+      padding: 2px 10px;
     }
 
     .page.active {
@@ -149,22 +149,25 @@
       ruby-align: center;
     }
 
-  .verse.highlight ruby .rb {
+    .verse.highlight ruby .rb {
       background: linear-gradient(90deg, #fffde4 0%, #ffe9b3 100%);
       padding: 2px 5px;
       border-radius: 4px;
       box-shadow: 0 1px 4px #0001;
     }
 
-  /* rb 互換用クラス */
-  ruby .rb { display: inline; }
+    /* rb 互換用クラス */
+    ruby .rb {
+      display: inline;
+    }
 
     .verse .char {
       display: inline-block;
     }
 
     .verse .char.highlight-char {
-      color: #007bff; /* 文字の青ハイライト */
+      color: #007bff;
+      /* 文字の青ハイライト */
       background: transparent;
     }
 
