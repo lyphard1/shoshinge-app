@@ -2,7 +2,7 @@
 // 音声再生、テキストハイライト、画像表示を管理
 
 // DOM要素の取得
-const audio = document.getElementById('audio');
+const audioElement = document.getElementById('audio');
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const progressBarContainer = document.getElementById('progressBarContainer');
@@ -42,12 +42,10 @@ const imageFiles = {
 };
 
 // 音声ファイルリスト（モード別）
-const audioFiles = {
-  shoshinge: 'audio/shoshinge.mp3',
-  wasan: 'audio/nenbutuwasan.mp3'
-};
-
-// 正信偈と念仏和讃のデータ（タイムコード付き）
+    const audioFiles = {
+      shoshinge: '/audio/shoshinge.mp3',
+      wasan: '/audio/nenbutuwasan.mp3'
+    };// 正信偈と念仏和讃のデータ（タイムコード付き）
 const originalPagesData = [
   // --- 正信偈 (shoshinge) ---
   {
@@ -129,10 +127,10 @@ function createPageElement(pageData) {
     rubyElement.appendChild(rtElement);
     verseDiv.appendChild(rubyElement);
     verseDiv.addEventListener('click', () => {
-      if (!isNaN(verseData.start) && audio.duration) {
-        audio.currentTime = verseData.start;
-        if (audio.paused) {
-          audio.play().catch(e => console.error("Error playing on verse click:", e));
+      if (!isNaN(verseData.start) && audioElement.duration) {
+        audioElement.currentTime = verseData.start;
+        if (audioElement.paused) {
+          audioElement.play().catch(e => console.error("Error playing on verse click:", e));
         }
       }
     });
@@ -153,10 +151,10 @@ function initialize() {
   switchMode(currentMode, true);
   playBtn.addEventListener('click', playAudio);
   pauseBtn.addEventListener('click', pauseAudio);
-  audio.addEventListener('timeupdate', handleTimeUpdate);
-  audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-  audio.addEventListener('ended', handleAudioEnded);
-  audio.addEventListener('error', handleAudioError);
+  audioElement.addEventListener('timeupdate', handleTimeUpdate);
+  audioElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+  audioElement.addEventListener('ended', handleAudioEnded);
+  audioElement.addEventListener('error', handleAudioError);
   progressBarContainer.addEventListener('click', handleProgressBarClick);
   playBtn.disabled = false;
   pauseBtn.disabled = true;
@@ -173,13 +171,13 @@ function switchMode(mode, isInitialLoad = false) {
   Object.values(modeButtons).forEach(btn => btn.classList.remove('active'));
   if (modeButtons[mode]) modeButtons[mode].classList.add('active');
   const newAudioSrc = audioFiles[mode];
-  const currentFileName = audio.currentSrc.substring(audio.currentSrc.lastIndexOf('/') + 1);
+  const currentFileName = audioElement.currentSrc.substring(audioElement.currentSrc.lastIndexOf('/') + 1);
   const newFileName = newAudioSrc.substring(newAudioSrc.lastIndexOf('/') + 1);
   if (isInitialLoad || currentFileName !== newFileName) {
-    audio.pause();
-    audio.src = newAudioSrc;
-    audio.load();
-    audio.currentTime = 0;
+    audioElement.pause();
+    audioElement.src = newAudioSrc;
+    audioElement.load();
+    audioElement.currentTime = 0;
     progressBar.style.width = '0%';
     playBtn.disabled = false;
     pauseBtn.disabled = true;
@@ -254,7 +252,7 @@ function highlightVerse(currentTime) {
     highlightedVerseElement.classList.add('highlight');
     showImage(currentPageIndex);
   } else {
-    if (audio.paused && audio.currentTime === 0) {
+    if (audioElement.paused && audioElement.currentTime === 0) {
       showImage(0);
     }
   }
@@ -268,17 +266,17 @@ function updateActivePage(highlightedVerseElement) {
     pageToShow = pages.find(p => p.dataset.section === currentMode && p.contains(highlightedVerseElement));
   }
   if (!pageToShow) {
-    if (!audio.paused) {
+    if (!audioElement.paused) {
       pageToShow = currentActivePage;
     } else {
       pageToShow = pages.find(p => p.dataset.section === currentMode);
-      if (audio.currentTime > 0) {
+      if (audioElement.currentTime > 0) {
         const pageAtCurrentTime = pages.find(p => {
           if (p.dataset.section !== currentMode) return false;
           const verses = p.querySelectorAll('.verse');
           const firstVerseStart = verses.length > 0 ? parseFloat(verses[0].dataset.start) : NaN;
           const lastVerseEnd = verses.length > 0 ? parseFloat(verses[verses.length - 1].dataset.end) : NaN;
-          return !isNaN(firstVerseStart) && !isNaN(lastVerseEnd) && audio.currentTime >= firstVerseStart && audio.currentTime < lastVerseEnd;
+          return !isNaN(firstVerseStart) && !isNaN(lastVerseEnd) && audioElement.currentTime >= firstVerseStart && audioElement.currentTime < lastVerseEnd;
         });
         if (pageAtCurrentTime) pageToShow = pageAtCurrentTime;
       }
@@ -300,7 +298,7 @@ function updateActivePage(highlightedVerseElement) {
 
 // 再生関数
 function playAudio() {
-  const playPromise = audio.play();
+  const playPromise = audioElement.play();
   if (playPromise !== undefined) {
     playPromise.then(_ => {
       playBtn.disabled = true;
@@ -320,7 +318,7 @@ function playAudio() {
 
 // 一時停止関数
 function pauseAudio() {
-  audio.pause();
+  audioElement.pause();
   playBtn.disabled = false;
   pauseBtn.disabled = true;
   console.log("Audio playback paused.");
@@ -328,16 +326,16 @@ function pauseAudio() {
 
 // 時間更新ハンドラー
 function handleTimeUpdate() {
-  if (audio.duration) {
-    progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%';
+  if (audioElement.duration) {
+    progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
   }
-  const highlightedVerseElement = highlightVerse(audio.currentTime);
+  const highlightedVerseElement = highlightVerse(audioElement.currentTime);
   updateActivePage(highlightedVerseElement);
 }
 
 // メタデータロードハンドラー
 function handleLoadedMetadata() {
-  console.log("Audio metadata loaded. Duration:", audio.duration, "Src:", audio.currentSrc);
+  console.log("Audio metadata loaded. Duration:", audioElement.duration, "Src:", audioElement.currentSrc);
   progressBar.style.width = '0%';
   playBtn.disabled = false;
   pauseBtn.disabled = true;
@@ -352,9 +350,9 @@ function handleAudioEnded() {
 
 // エラーハンドラー（強化）
 function handleAudioError(e) {
-  console.error("Audio Error:", audio.error, "Src:", audio.currentSrc);
-  const err = audio.error;
-  let message = `音声ファイルの読み込み/再生に失敗しました。\nファイル: ${audio.currentSrc.split('/').pop()}`;
+  console.error("Audio Error:", audioElement.error, "Src:", audioElement.currentSrc);
+  const err = audioElement.error;
+  let message = `音声ファイルの読み込み/再生に失敗しました。\nファイル: ${audioElement.currentSrc.split('/').pop()}`;
   if (err) {
     message += `\nエラーコード: ${err.code}`;
     switch (err.code) {
@@ -381,19 +379,19 @@ function handleAudioError(e) {
 
 // プログレスバークリックハンドラー
 function handleProgressBarClick(e) {
-  if (!audio.duration || !isFinite(audio.duration)) {
+  if (!audioElement.duration || !isFinite(audioElement.duration)) {
     console.warn("Cannot seek: Audio duration not available or invalid.");
     return;
   }
   const rect = progressBarContainer.getBoundingClientRect();
   const offsetX = e.clientX - rect.left;
-  const newTime = (offsetX / rect.width) * audio.duration;
+  const newTime = (offsetX / rect.width) * audioElement.duration;
   if (isFinite(newTime)) {
-    audio.currentTime = newTime;
+    audioElement.currentTime = newTime;
     console.log(`Seeked to: ${newTime.toFixed(2)}s`);
-    const highlightedVerseElement = highlightVerse(audio.currentTime);
+    const highlightedVerseElement = highlightVerse(audioElement.currentTime);
     updateActivePage(highlightedVerseElement);
-    progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%';
+    progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
   } else {
     console.warn("Cannot seek: Calculated time is not finite.", newTime);
   }
