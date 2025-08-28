@@ -2,7 +2,9 @@
 // 音声再生、テキストハイライト、画像表示を管理
 
 // DOM要素の取得
-const audioElement = document.getElementById('audio');
+const audioElement = document.createElement('audio');
+audioElement.id = 'audio';
+document.body.appendChild(audioElement);
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const progressBarContainer = document.getElementById('progressBarContainer');
@@ -43,8 +45,8 @@ const imageFiles = {
 
 // 音声ファイルリスト（モード別）
     const audioFiles = {
-      shoshinge: '/audio/shoshinge.mp3',
-      wasan: '/audio/nenbutuwasan.mp3'
+      shoshinge: '/shoshinge-app/audio/shoshinge.mp3',
+      wasan: '/shoshinge-app/audio/nenbutuwasan.mp3'
     };// 正信偈と念仏和讃のデータ（タイムコード付き）
 const originalPagesData = [
   // --- 正信偈 (shoshinge) ---
