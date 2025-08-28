@@ -118,13 +118,6 @@
       background: #f1f5f9;
     }
 
-    #playbackControls button.active {
-      background: linear-gradient(180deg, #4299e1 60%, #3182ce 100%);
-      border-color: #2c5282;
-      color: white;
-      box-shadow: 0 2px 12px #0003;
-    }
-
     #progressBarContainer {
       flex-grow: 1;
       min-width: 320px;
@@ -239,21 +232,22 @@
 
   <h1>正信偈・念仏和讃</h1>
 
-    <div id="controlsContainer">
-      <div id="modeSelector">
-        <button id="btn-shoshinge" onclick="switchMode('shoshinge')" class="active">正信偈</button>
-        <button id="btn-wasan" onclick="switchMode('wasan')">念仏和讃</button>
-      </div>
+  <div id="controlsContainer">
+    <div id="modeSelector">
+      <button id="btn-shoshinge" onclick="switchMode('shoshinge')" class="active">正信偈</button>
+      <button id="btn-wasan" onclick="switchMode('wasan')">念仏和讃</button>
+    </div>
 
-      <div id="playbackControls">
-        <button id="playBtn" title="再生">▶️</button>
-        <button id="pauseBtn" title="一時停止">⏸️</button>
-        <button id="sequentialBtn" title="順番ハイライト">🔄</button>
-        <div id="progressBarContainer" title="クリックして再生位置を変更">
-          <div id="progressBar"></div>
-        </div>
+    <div id="playbackControls">
+      <button id="playBtn" title="再生">▶️</button>
+      <button id="pauseBtn" title="一時停止">⏸️</button>
+      <div id="progressBarContainer" title="クリックして再生位置を変更">
+        <div id="progressBar"></div>
       </div>
-    </div>  <audio id="audio" src="audio/shoshinge.mp3"></audio>
+    </div>
+  </div>
+
+  <audio id="audio" src="audio/shoshinge.mp3"></audio>
 
   <div id="pagesContainer"></div>
 
@@ -265,7 +259,6 @@
     const audio = document.getElementById('audio');
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
-    const sequentialBtn = document.getElementById('sequentialBtn');
     const progressBarContainer = document.getElementById('progressBarContainer');
     const progressBar = document.getElementById('progressBar');
     const pagesContainer = document.getElementById('pagesContainer');
@@ -279,9 +272,6 @@
     let pages = [];
     let currentActivePage = null;
     let currentImageIndex = -1;
-    let isSequentialMode = false; // 順番ハイライトモードのフラグ
-    let sequentialIndex = 0; // 順番ハイライトの現在のインデックス
-    let sequentialTimer = null; // 順番ハイライト用のタイマー
 
     // 画像ファイルマップ（クリーン版）
     const imageFiles = {
@@ -603,7 +593,6 @@
       setTimeout(computeFixedPageHeight, 0);
       playBtn.addEventListener('click', playAudio);
       pauseBtn.addEventListener('click', pauseAudio);
-      sequentialBtn.addEventListener('click', toggleSequentialMode);
       audio.addEventListener('timeupdate', handleTimeUpdate);
       audio.addEventListener('loadedmetadata', handleLoadedMetadata);
       audio.addEventListener('ended', handleAudioEnded);
@@ -617,12 +606,6 @@
 
     function switchMode(mode, isInitialLoad = false) {
       if (!isInitialLoad && currentMode === mode) return;
-
-      // 順番ハイライトモードを停止
-      if (isSequentialMode) {
-        stopSequentialHighlight();
-      }
-
       console.log(`Switching mode to: ${mode}`);
       currentMode = mode;
       currentActivePage = null;
@@ -694,14 +677,8 @@
 
     /**
      * 現在時刻に基づいて句をハイライトし、対応する画像を表示する
-     * 順番ハイライトモード時は動作しない
      */
     function highlightVerse(currentTime) {
-      // 順番ハイライトモード時は通常のハイライトを行わない
-      if (isSequentialMode) {
-        return null;
-      }
-
       let highlightedVerseElement = null;
       let overallVerseIndex = -1;
       let currentPageIndex = -1;
@@ -781,11 +758,6 @@
     }
 
     function playAudio() {
-      // 順番ハイライトモード時は停止
-      if (isSequentialMode) {
-        stopSequentialHighlight();
-      }
-
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.then(_ => {
@@ -796,100 +768,6 @@
       } else { playBtn.disabled = true; pauseBtn.disabled = false; }
     }
     function pauseAudio() { audio.pause(); playBtn.disabled = false; pauseBtn.disabled = true; console.log("Audio playback paused."); }
-
-    // 順番ハイライトモードの切り替え
-    function toggleSequentialMode() {
-      if (isSequentialMode) {
-        stopSequentialHighlight();
-      } else {
-        startSequentialHighlight();
-      }
-    }
-
-    // 順番ハイライトを開始
-    function startSequentialHighlight() {
-      if (isSequentialMode) return;
-
-      isSequentialMode = true;
-      sequentialIndex = 0;
-      sequentialBtn.classList.add('active');
-      sequentialBtn.title = '順番ハイライト停止';
-
-      // 音声再生を停止
-      audio.pause();
-      playBtn.disabled = false;
-      pauseBtn.disabled = true;
-
-      // 全てのハイライトを解除
-      pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
-
-      // 順番ハイライトを開始
-      highlightNextVerse();
-
-      console.log("Sequential highlight mode started.");
-    }
-
-    // 順番ハイライトを停止
-    function stopSequentialHighlight() {
-      if (!isSequentialMode) return;
-
-      isSequentialMode = false;
-      sequentialBtn.classList.remove('active');
-      sequentialBtn.title = '順番ハイライト';
-
-      if (sequentialTimer) {
-        clearTimeout(sequentialTimer);
-        sequentialTimer = null;
-      }
-
-      // 全てのハイライトを解除
-      pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
-
-      console.log("Sequential highlight mode stopped.");
-    }
-
-    // 次の句をハイライト
-    function highlightNextVerse() {
-      if (!isSequentialMode) return;
-
-      const pagesOfMode = pages.filter(p => p.dataset.section === currentMode);
-      const allVerses = [];
-
-      // 全ての句を順番に収集
-      pagesOfMode.forEach(page => {
-        const verses = Array.from(page.querySelectorAll('.verse'));
-        allVerses.push(...verses);
-      });
-
-      if (sequentialIndex >= allVerses.length) {
-        // 全ての句をハイライトし終わったら停止
-        stopSequentialHighlight();
-        return;
-      }
-
-      // 現在の句をハイライト
-      const currentVerse = allVerses[sequentialIndex];
-      const currentPage = currentVerse.closest('.page');
-      const pageIndex = pagesOfMode.indexOf(currentPage);
-
-      // 全てのハイライトを解除
-      pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
-
-      // 新しい句をハイライト
-      currentVerse.classList.add('highlight');
-
-      // ページを表示
-      updateActivePage(currentVerse);
-
-      // 画像を更新
-      showImage(pageIndex);
-
-      // 次の句へ
-      sequentialIndex++;
-
-      // 次のハイライトをスケジュール（2秒間隔）
-      sequentialTimer = setTimeout(highlightNextVerse, 2000);
-    }
     function handleTimeUpdate() { if (audio.duration) { progressBar.style.width = (audio.currentTime / audio.duration) * 100 + '%'; } const highlightedVerseElement = highlightVerse(audio.currentTime); updateActivePage(highlightedVerseElement); }
     function handleLoadedMetadata() { console.log("Audio metadata loaded. Duration:", audio.duration, "Src:", audio.currentSrc); progressBar.style.width = '0%'; playBtn.disabled = false; pauseBtn.disabled = true; }
     function handleAudioEnded() { console.log("Audio ended."); playBtn.disabled = false; pauseBtn.disabled = true; }
