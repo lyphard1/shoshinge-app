@@ -120,14 +120,26 @@ function createPageElement(pageData) {
     verseDiv.classList.add('verse');
     verseDiv.dataset.start = verseData.start;
     verseDiv.dataset.end = verseData.end;
+
     const rubyElement = document.createElement('ruby');
     const rbElement = document.createElement('rb');
-    rbElement.textContent = verseData.text;
+    // 一文字ずつspan化（後でchar単位でハイライト）
+    const text = verseData.text || '';
+    for (let i = 0; i < text.length; i++) {
+      const charSpan = document.createElement('span');
+      charSpan.classList.add('char');
+      charSpan.textContent = text[i];
+      charSpan.dataset.charIndex = i;
+      rbElement.appendChild(charSpan);
+    }
+
     const rtElement = document.createElement('rt');
     rtElement.textContent = verseData.ruby || '';
+
     rubyElement.appendChild(rbElement);
     rubyElement.appendChild(rtElement);
     verseDiv.appendChild(rubyElement);
+
     verseDiv.addEventListener('click', () => {
       if (!isNaN(verseData.start) && audioElement.duration) {
         audioElement.currentTime = verseData.start;
@@ -136,6 +148,7 @@ function createPageElement(pageData) {
         }
       }
     });
+
     pageDiv.appendChild(verseDiv);
   });
   return pageDiv;
@@ -249,9 +262,28 @@ function highlightVerse(currentTime) {
     }
     if (highlightedVerseElement) break;
   }
-  pages.forEach(p => p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight')));
+  // 既存のハイライトをリセット（句・文字）
+  pages.forEach(p => {
+    p.querySelectorAll('.verse.highlight').forEach(v => v.classList.remove('highlight'));
+    p.querySelectorAll('.char.highlight-char').forEach(c => c.classList.remove('highlight-char'));
+  });
   if (highlightedVerseElement) {
     highlightedVerseElement.classList.add('highlight');
+    // 文字単位ハイライト
+    const verseStart = parseFloat(highlightedVerseElement.dataset.start);
+    const verseEnd = parseFloat(highlightedVerseElement.dataset.end);
+    const verseDuration = verseEnd - verseStart;
+    const elapsedTime = currentTime - verseStart;
+    const chars = Array.from(highlightedVerseElement.querySelectorAll('rb .char'));
+    if (chars.length > 0 && verseDuration > 0) {
+      const charDuration = verseDuration / chars.length;
+      let charIndex = Math.floor(elapsedTime / charDuration);
+      if (charIndex < 0) charIndex = 0;
+      if (charIndex >= chars.length) charIndex = chars.length - 1;
+      // 念のため、その句内の既存charハイライトを除去してから付与
+      chars.forEach(c => c.classList.remove('highlight-char'));
+      chars[charIndex].classList.add('highlight-char');
+    }
     showImage(currentPageIndex);
   } else {
     if (audioElement.paused && audioElement.currentTime === 0) {
