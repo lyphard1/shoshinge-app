@@ -144,12 +144,15 @@
       ruby-align: center;
     }
 
-    .verse.highlight ruby rb {
+  .verse.highlight ruby .rb {
       background: linear-gradient(90deg, #fffde4 0%, #ffe9b3 100%);
       padding: 2px 5px;
       border-radius: 4px;
       box-shadow: 0 1px 4px #0001;
     }
+
+  /* rb 互換用クラス */
+  ruby .rb { display: inline; }
 
     .verse .char {
       display: inline-block;

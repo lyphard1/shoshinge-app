@@ -121,8 +121,10 @@ function createPageElement(pageData) {
     verseDiv.dataset.start = verseData.start;
     verseDiv.dataset.end = verseData.end;
 
-    const rubyElement = document.createElement('ruby');
-    const rbElement = document.createElement('rb');
+  const rubyElement = document.createElement('ruby');
+  // 一部ブラウザで <rb> の扱いが不安定なため、span.rb を使用
+  const rbElement = document.createElement('span');
+  rbElement.classList.add('rb');
     // 一文字ずつspan化（後でchar単位でハイライト）
     const text = verseData.text || '';
     for (let i = 0; i < text.length; i++) {
@@ -274,7 +276,7 @@ function highlightVerse(currentTime) {
     const verseEnd = parseFloat(highlightedVerseElement.dataset.end);
     const verseDuration = verseEnd - verseStart;
     const elapsedTime = currentTime - verseStart;
-    const chars = Array.from(highlightedVerseElement.querySelectorAll('rb .char'));
+  const chars = Array.from(highlightedVerseElement.querySelectorAll('.rb .char'));
     if (chars.length > 0 && verseDuration > 0) {
       const charDuration = verseDuration / chars.length;
       let charIndex = Math.floor(elapsedTime / charDuration);
