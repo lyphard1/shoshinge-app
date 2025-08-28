@@ -205,8 +205,13 @@ function createPageElement(pageData) {
       if (!isNaN(verseData.start)) {
         audioElement.currentTime = verseData.start;
         // 停止中は自動再生しない。UIだけ即時反映
-        const highlighted = highlightVerse(audioElement.currentTime);
+        // ハイライトは補正時間で再計算
+        const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
         updateActivePage(highlighted);
+        // 再生中/停止中に関わらず進捗バーを即時更新（timeupdate待ちでズレないように）
+        if (audioElement.duration && isFinite(audioElement.duration)) {
+          progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
+        }
       }
     });
 
@@ -339,7 +344,7 @@ function highlightVerse(currentTime) {
       const v = versesOnPage[j];
       const start = parseFloat(v.dataset.start);
       const end = parseFloat(v.dataset.end);
-  if (!isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
+      if (!isNaN(start) && !isNaN(end) && currentTime >= start && currentTime < end) {
         highlightedVerseElement = v;
         currentPageIndex = i;
         break;
@@ -371,7 +376,7 @@ function highlightVerse(currentTime) {
     }
     showImage(currentPageIndex);
   } else {
-  if (audioElement.paused && audioElement.currentTime === 0) {
+    if (audioElement.paused && audioElement.currentTime === 0) {
       showImage(0);
     }
   }
@@ -518,7 +523,7 @@ function handleProgressBarClick(e) {
   if (isFinite(newTime)) {
     audioElement.currentTime = newTime;
     console.log(`Seeked to: ${newTime.toFixed(2)}s`);
-  const highlightedVerseElement = highlightVerse(getEffectiveTime(audioElement.currentTime));
+    const highlightedVerseElement = highlightVerse(getEffectiveTime(audioElement.currentTime));
     updateActivePage(highlightedVerseElement);
     progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
   } else {
