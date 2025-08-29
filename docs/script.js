@@ -148,6 +148,7 @@ const originalPagesData = [
   },
   { section: 'wasan', verses: [{ start: 455.2, end: 463, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 463, end: 471, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 471, end: 479, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 479, end: 487, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
   { section: 'wasan', verses: [{ start: 487, end: 495, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 495, end: 503, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 503, end: 511, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 511, end: 519, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
+  { section: 'wasan', verses: [{ start: 574.5, end: 582.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 582.3, end: 590.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 590.3, end: 598.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 598.3, end: 606.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
   {
     section: 'wasan', verses: [
       { start: 519, end: 536.8, text: '清浄光明ならびなし', ruby: '' },
@@ -156,7 +157,6 @@ const originalPagesData = [
       { start: 562.2, end: 574.5, text: '畢竟依を帰命せよ', ruby: '' }
     ]
   },
-  { section: 'wasan', verses: [{ start: 574.5, end: 582.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 582.3, end: 590.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 590.3, end: 598.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 598.3, end: 606.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
   { section: 'wasan', verses: [{ start: 606.3, end: 614.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 614.3, end: 622.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 622.3, end: 630.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 630.3, end: 638.3, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] },
   {
     section: 'wasan', verses: [
@@ -166,7 +166,14 @@ const originalPagesData = [
       { start: 681.5, end: 693.8, text: '大応供を帰命せよ', ruby: '' }
     ]
   },
-  { section: 'wasan', verses: [{ start: 693.8, end: 701.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 701.6, end: 709.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 709.6, end: 717.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }, { start: 717.6, end: 725.6, text: '南無阿弥陀仏', ruby: 'なもあみだーんぶ' }] }
+  {
+    section: 'wasan', verses: [
+      { start: 693.8, end: 700.5, text: '願以此功徳', ruby: '' },
+      { start: 700.5, end: 707.2, text: '平等施一切', ruby: '' },
+      { start: 707.2, end: 715.0, text: '同発菩提心', ruby: '' },
+      { start: 715.0, end: 725.6, text: '往生安楽国', ruby: '' }
+    ]
+  }
 ];
 
 // ページ要素を作成する関数
