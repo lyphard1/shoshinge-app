@@ -3,3 +3,11 @@
 /audio/nenbutuwasan.m4a
 /audio/nenbutuwasan.mp3
 /audio/shoshinge.mp3
+
+# Audacityプロジェクトファイル（大容量のため除外）
+*.aup3
+*.aup3-shm
+*.aup3-wal
+
+# 一時ファイル
+.DS_Store
