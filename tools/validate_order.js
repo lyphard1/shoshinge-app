@@ -82,11 +82,8 @@ function compare(ref, cur) {
             for (let j = 0; j < maxVerses; j++) {
                 const refText = stripRuby(refVerses[j] || '');
                 const curText = stripRuby(curVerses[j] || '');
-                // 許容: 和讃の「南無阿弥陀仏」 vs 「南」などは先頭一致でOK
+                // 厳密一致のみ（許容ルール無効化）
                 let ok = refText === curText;
-                if (!ok && mode === 'wasan') {
-                    if (refText.startsWith(curText) || curText.startsWith(refText)) ok = true;
-                }
                 if (!ok) {
                     diffs.push({ mode, page: i + 1, verse: j + 1, refText, curText });
                 }
