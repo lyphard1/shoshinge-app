@@ -200,22 +200,20 @@ function createPageElement(pageData) {
           const expectedTime = verseData.start;
           const timeDiff = Math.abs(actualTime - expectedTime);
           console.log(`Seeked event fired: expected=${expectedTime}s, actual=${actualTime}s, diff=${timeDiff.toFixed(3)}s`);
-          
+
           const highlighted = highlightVerse(audioElement.currentTime);
           updateActivePage(highlighted);
           // 進捗バーを即時更新
           if (audioElement.duration && isFinite(audioElement.duration)) {
             progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
           }
-          // 再生中だった場合は再生を継続
-          if (wasPlaying) {
-            console.log('Resuming playback');
-            audioElement.play().then(() => {
-              console.log('Playback resumed successfully');
-            }).catch(err => {
-              console.error('Failed to resume playback:', err);
-            });
-          }
+          // 常にその句の最初から再生を開始
+          console.log('Starting playback from verse beginning');
+          audioElement.play().then(() => {
+            console.log('Playback started successfully');
+          }).catch(err => {
+            console.error('Failed to start playback:', err);
+          });
           audioElement.removeEventListener('seeked', handleSeeked);
         };
 
@@ -231,22 +229,20 @@ function createPageElement(pageData) {
           const expectedTime = verseData.start;
           const timeDiff = Math.abs(actualTime - expectedTime);
           console.log(`Fallback timeout: expected=${expectedTime}s, actual=${actualTime}s, diff=${timeDiff.toFixed(3)}s`);
-          
+
           audioElement.removeEventListener('seeked', handleSeeked);
           const highlighted = highlightVerse(audioElement.currentTime);
           updateActivePage(highlighted);
           if (audioElement.duration && isFinite(audioElement.duration)) {
             progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
           }
-          // 再生中だった場合は再生を継続
-          if (wasPlaying) {
-            console.log('Resuming playback (fallback)');
-            audioElement.play().then(() => {
-              console.log('Playback resumed successfully (fallback)');
-            }).catch(err => {
-              console.error('Failed to resume playback (fallback):', err);
-            });
-          }
+          // 常にその句の最初から再生を開始
+          console.log('Starting playback from verse beginning (fallback)');
+          audioElement.play().then(() => {
+            console.log('Playback started successfully (fallback)');
+          }).catch(err => {
+            console.error('Failed to start playback (fallback):', err);
+          });
         }, 100);
       }
     });
