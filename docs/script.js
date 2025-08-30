@@ -206,9 +206,7 @@ function createPageElement(pageData) {
           const timeDiff = Math.abs(actualTime - expectedTime);
           console.log(`Seeked event fired: expected=${expectedTime}s, actual=${actualTime}s, diff=${timeDiff.toFixed(3)}s`);
 
-          const highlighted = highlightVerse(audioElement.currentTime);
-          console.log(`Highlighted verse:`, highlighted ? highlighted.textContent : 'No verse highlighted');
-          updateActivePage(highlighted);
+          // ハイライト処理は再生開始後の自然な更新に任せる
           // 進捗バーを即時更新
           if (audioElement.duration && isFinite(audioElement.duration)) {
             progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
@@ -217,9 +215,18 @@ function createPageElement(pageData) {
           console.log('Starting playback from verse beginning');
           audioElement.play().then(() => {
             console.log('Playback started successfully');
-            // 再生開始直後の位置を確認
+            // 再生開始後に正しいハイライトを確認
             setTimeout(() => {
-              console.log(`Playback position after start: ${audioElement.currentTime}s`);
+              const finalTime = audioElement.currentTime;
+              const expectedTime = verseData.start;
+              console.log(`Final playback position: ${finalTime}s, expected: ${expectedTime}s`);
+              
+              // もし位置がまだずれている場合は再度修正
+              if (Math.abs(finalTime - expectedTime) > 1.0) {
+                console.log('Position still incorrect, correcting again...');
+                audioElement.currentTime = expectedTime;
+              }
+              
               const currentHighlight = highlightVerse(audioElement.currentTime);
               console.log(`Current highlighted verse:`, currentHighlight ? currentHighlight.textContent : 'No verse highlighted');
             }, 100);
@@ -231,7 +238,19 @@ function createPageElement(pageData) {
 
         audioElement.addEventListener('seeked', handleSeeked);
         console.log(`Setting currentTime to ${verseData.start}s`);
-        audioElement.currentTime = verseData.start;
+        
+        // より確実なシーク方法: 複数回設定して確実に位置を変更
+        const targetTime = verseData.start;
+        audioElement.currentTime = targetTime;
+        
+        // 確実にシークされるまで少し待機してから再度設定
+        setTimeout(() => {
+          if (Math.abs(audioElement.currentTime - targetTime) > 0.1) {
+            console.log(`Correcting seek: current=${audioElement.currentTime}s, target=${targetTime}s`);
+            audioElement.currentTime = targetTime;
+          }
+        }, 50);
+        
         console.log(`After setting: currentTime=${audioElement.currentTime}s`);
 
         // フォールバック: seekedイベントが発火しない場合のため
@@ -245,8 +264,7 @@ function createPageElement(pageData) {
           console.log(`Fallback timeout: expected=${expectedTime}s, actual=${actualTime}s, diff=${timeDiff.toFixed(3)}s`);
 
           audioElement.removeEventListener('seeked', handleSeeked);
-          const highlighted = highlightVerse(audioElement.currentTime);
-          updateActivePage(highlighted);
+          // ハイライト処理は再生開始後の自然な更新に任せる
           if (audioElement.duration && isFinite(audioElement.duration)) {
             progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
           }
