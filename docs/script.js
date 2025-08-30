@@ -185,8 +185,9 @@ function createPageElement(pageData) {
     verseDiv.addEventListener('click', () => {
       if (!isNaN(verseData.start)) {
         console.log(`Verse clicked: seeking to ${verseData.start}s`);
+        console.log(`Clicked verse text: "${verseData.text}"`);
         console.log(`Before seek: currentTime=${audioElement.currentTime}s, paused=${audioElement.paused}`);
-        
+
         // 再生を一時停止してからシーク
         if (!audioElement.paused) {
           audioElement.pause();
@@ -206,6 +207,7 @@ function createPageElement(pageData) {
           console.log(`Seeked event fired: expected=${expectedTime}s, actual=${actualTime}s, diff=${timeDiff.toFixed(3)}s`);
 
           const highlighted = highlightVerse(audioElement.currentTime);
+          console.log(`Highlighted verse:`, highlighted ? highlighted.textContent : 'No verse highlighted');
           updateActivePage(highlighted);
           // 進捗バーを即時更新
           if (audioElement.duration && isFinite(audioElement.duration)) {
@@ -215,6 +217,12 @@ function createPageElement(pageData) {
           console.log('Starting playback from verse beginning');
           audioElement.play().then(() => {
             console.log('Playback started successfully');
+            // 再生開始直後の位置を確認
+            setTimeout(() => {
+              console.log(`Playback position after start: ${audioElement.currentTime}s`);
+              const currentHighlight = highlightVerse(audioElement.currentTime);
+              console.log(`Current highlighted verse:`, currentHighlight ? currentHighlight.textContent : 'No verse highlighted');
+            }, 100);
           }).catch(err => {
             console.error('Failed to start playback:', err);
           });
