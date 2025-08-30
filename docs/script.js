@@ -53,7 +53,7 @@ const audioFiles = {
 };// 正信偈と念仏和讃のデータ（タイムコード付き）
 const originalPagesData = [
   // --- 正信偈 (shoshinge) ---
-  { section: 'shoshinge', verses: [{ start: 6.851926, end: 21.503062, text: '帰命無量寿如来', ruby: 'きみょうむりょうじゅにょらい' }, { start: 21.518901, end: 29.935215, text: '南無不可思議光', ruby: 'なむふかしぎこう' }, { start: 30.584057, end: 37.780306, text: '法蔵菩薩因位時', ruby: 'ほうぞうぼさついんにじ' }, { start: 38.458641, end: 45.094526, text: '在世自在王仏所', ruby: 'ざいせいじざいおうぶっしょ' }] },
+  { section: 'shoshinge', verses: [{ start: 6.351926, end: 21.503062, text: '帰命無量寿如来', ruby: 'きみょうむりょうじゅにょらい' }, { start: 21.018901, end: 29.935215, text: '南無不可思議光', ruby: 'なむふかしぎこう' }, { start: 30.084057, end: 37.780306, text: '法蔵菩薩因位時', ruby: 'ほうぞうぼさついんにじ' }, { start: 37.958641, end: 45.094526, text: '在世自在王仏所', ruby: 'ざいせいじざいおうぶっしょ' }] },
   // --- 正信偈 (shoshinge) ---
   { section: 'shoshinge', verses: [{ start: 45.772861, end: 52.172803, text: '覩見諸仏浄土因', ruby: 'とけんしょぶつじょうどいん' }, { start: 52.821646, end: 58.92666, text: '国土人天之善悪', ruby: 'こくどにんでんしぜんまく' }, { start: 59.693473, end: 65.916459, text: '建立無上殊勝願', ruby: 'こんりゅうむじょうしゅしょうがん' }, { start: 66.594794, end: 72.674448, text: '超発希有大弘誓', ruby: 'ちょうほつけーうだいぐぜい' }] },
   // --- 正信偈 (shoshinge) ---
@@ -220,13 +220,13 @@ function createPageElement(pageData) {
               const finalTime = audioElement.currentTime;
               const expectedTime = verseData.start;
               console.log(`Final playback position: ${finalTime}s, expected: ${expectedTime}s`);
-              
+
               // もし位置がまだずれている場合は再度修正
               if (Math.abs(finalTime - expectedTime) > 1.0) {
                 console.log('Position still incorrect, correcting again...');
                 audioElement.currentTime = expectedTime;
               }
-              
+
               const currentHighlight = highlightVerse(audioElement.currentTime);
               console.log(`Current highlighted verse:`, currentHighlight ? currentHighlight.textContent : 'No verse highlighted');
             }, 100);
@@ -238,11 +238,11 @@ function createPageElement(pageData) {
 
         audioElement.addEventListener('seeked', handleSeeked);
         console.log(`Setting currentTime to ${verseData.start}s`);
-        
+
         // より確実なシーク方法: 複数回設定して確実に位置を変更
         const targetTime = verseData.start;
         audioElement.currentTime = targetTime;
-        
+
         // 確実にシークされるまで少し待機してから再度設定
         setTimeout(() => {
           if (Math.abs(audioElement.currentTime - targetTime) > 0.1) {
@@ -250,7 +250,7 @@ function createPageElement(pageData) {
             audioElement.currentTime = targetTime;
           }
         }, 50);
-        
+
         console.log(`After setting: currentTime=${audioElement.currentTime}s`);
 
         // フォールバック: seekedイベントが発火しない場合のため
