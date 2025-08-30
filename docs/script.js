@@ -184,102 +184,19 @@ function createPageElement(pageData) {
 
     verseDiv.addEventListener('click', () => {
       if (!isNaN(verseData.start)) {
-        console.log(`Verse clicked: seeking to ${verseData.start}s`);
-        console.log(`Clicked verse text: "${verseData.text}"`);
-        console.log(`Before seek: currentTime=${audioElement.currentTime}s, paused=${audioElement.paused}`);
-
-        // 再生を一時停止してからシーク
-        if (!audioElement.paused) {
-          audioElement.pause();
-          console.log('Audio paused before seek');
-        }
-
-        let seekCompleted = false;
-
-        // seekedイベントでシーク完了後にUIを更新
-        const handleSeeked = () => {
-          if (seekCompleted) return; // 重複実行を防止
-          seekCompleted = true;
-
-          const actualTime = audioElement.currentTime;
-          const expectedTime = verseData.start;
-          const timeDiff = Math.abs(actualTime - expectedTime);
-          console.log(`Seeked event fired: expected=${expectedTime}s, actual=${actualTime}s, diff=${timeDiff.toFixed(3)}s`);
-
-          // ハイライト処理は再生開始後の自然な更新に任せる
-          // 進捗バーを即時更新
-          if (audioElement.duration && isFinite(audioElement.duration)) {
-            progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
-          }
-          // 常にその句の最初から再生を開始
-          console.log('Starting playback from verse beginning');
-          audioElement.play().then(() => {
-            console.log('Playback started successfully');
-            // 再生開始後に正しいハイライトを確認
-            setTimeout(() => {
-              const finalTime = audioElement.currentTime;
-              const expectedTime = verseData.start;
-              console.log(`Final playback position: ${finalTime}s, expected: ${expectedTime}s`);
-
-              // もし位置がまだずれている場合は再度修正
-              if (Math.abs(finalTime - expectedTime) > 1.0) {
-                console.log('Position still incorrect, correcting again...');
-                audioElement.currentTime = expectedTime;
-              }
-
-              const currentHighlight = highlightVerse(audioElement.currentTime);
-              console.log(`Current highlighted verse:`, currentHighlight ? currentHighlight.textContent : 'No verse highlighted');
-            }, 100);
-          }).catch(err => {
-            console.error('Failed to start playback:', err);
-          });
-          audioElement.removeEventListener('seeked', handleSeeked);
-        };
-
-        audioElement.addEventListener('seeked', handleSeeked);
-        console.log(`Setting currentTime to ${verseData.start}s`);
-
-        // より確実なシーク方法: 複数回設定して確実に位置を変更
-        const targetTime = verseData.start;
-        audioElement.currentTime = targetTime;
-
-        // 確実にシークされるまで少し待機してから再度設定
-        setTimeout(() => {
-          if (Math.abs(audioElement.currentTime - targetTime) > 0.1) {
-            console.log(`Correcting seek: current=${audioElement.currentTime}s, target=${targetTime}s`);
-            audioElement.currentTime = targetTime;
-          }
-        }, 50);
-
-        console.log(`After setting: currentTime=${audioElement.currentTime}s`);
-
-        // フォールバック: seekedイベントが発火しない場合のため
-        setTimeout(() => {
-          if (seekCompleted) return; // すでに処理済みの場合はスキップ
-          seekCompleted = true;
-
-          const actualTime = audioElement.currentTime;
-          const expectedTime = verseData.start;
-          const timeDiff = Math.abs(actualTime - expectedTime);
-          console.log(`Fallback timeout: expected=${expectedTime}s, actual=${actualTime}s, diff=${timeDiff.toFixed(3)}s`);
-
-          audioElement.removeEventListener('seeked', handleSeeked);
-          // ハイライト処理は再生開始後の自然な更新に任せる
-          if (audioElement.duration && isFinite(audioElement.duration)) {
-            progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
-          }
-          // 常にその句の最初から再生を開始
-          console.log('Starting playback from verse beginning (fallback)');
-          audioElement.play().then(() => {
-            console.log('Playback started successfully (fallback)');
-          }).catch(err => {
-            console.error('Failed to start playback (fallback):', err);
-          });
-        }, 100);
+        console.log(`Verse clicked: "${verseData.text}" seeking to ${verseData.start}s`);
+        
+        // シンプルで確実なシーク処理
+        audioElement.currentTime = verseData.start;
+        
+        // 再生を開始（一時停止されている場合も再開）
+        audioElement.play().then(() => {
+          console.log(`Playing from ${audioElement.currentTime}s`);
+        }).catch(err => {
+          console.error('Failed to start playback:', err);
+        });
       }
-    });
-
-    pageDiv.appendChild(verseDiv);
+    });    pageDiv.appendChild(verseDiv);
   });
   return pageDiv;
 }
