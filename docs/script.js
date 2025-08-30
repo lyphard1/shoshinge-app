@@ -186,8 +186,12 @@ function createPageElement(pageData) {
       if (!isNaN(verseData.start)) {
         console.log(`Verse clicked: seeking to ${verseData.start}s`);
         console.log(`Before seek: currentTime=${audioElement.currentTime}s, paused=${audioElement.paused}`);
-        const wasPlaying = !audioElement.paused;
-        console.log(`Was playing: ${wasPlaying}`);
+        
+        // 再生を一時停止してからシーク
+        if (!audioElement.paused) {
+          audioElement.pause();
+          console.log('Audio paused before seek');
+        }
 
         let seekCompleted = false;
 
@@ -218,7 +222,9 @@ function createPageElement(pageData) {
         };
 
         audioElement.addEventListener('seeked', handleSeeked);
+        console.log(`Setting currentTime to ${verseData.start}s`);
         audioElement.currentTime = verseData.start;
+        console.log(`After setting: currentTime=${audioElement.currentTime}s`);
 
         // フォールバック: seekedイベントが発火しない場合のため
         setTimeout(() => {
