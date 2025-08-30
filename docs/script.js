@@ -184,14 +184,40 @@ function createPageElement(pageData) {
 
     verseDiv.addEventListener('click', () => {
       if (!isNaN(verseData.start)) {
+        console.log(`Verse clicked: seeking to ${verseData.start}s`);
+        const wasPlaying = !audioElement.paused;
+        console.log(`Was playing: ${wasPlaying}`);
+        
+        // seekedイベントでシーク完了後にUIを更新
+        const handleSeeked = () => {
+          console.log(`Seeked event fired: current time = ${audioElement.currentTime}s`);
+          const highlighted = highlightVerse(audioElement.currentTime);
+          updateActivePage(highlighted);
+          // 進捗バーを即時更新
+          if (audioElement.duration && isFinite(audioElement.duration)) {
+            progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
+          }
+          // 再生中だった場合は再生を継続
+          if (wasPlaying && audioElement.paused) {
+            console.log('Resuming playback');
+            audioElement.play();
+          }
+          audioElement.removeEventListener('seeked', handleSeeked);
+        };
+
+        audioElement.addEventListener('seeked', handleSeeked);
         audioElement.currentTime = verseData.start;
-        // 停止中は自動再生しない。UIだけ即時反映
-        const highlighted = highlightVerse(audioElement.currentTime);
-        updateActivePage(highlighted);
-        // 再生中/停止中に関わらず進捗バーを即時更新（timeupdate待ちでズレないように）
-        if (audioElement.duration && isFinite(audioElement.duration)) {
-          progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
-        }
+
+        // フォールバック: seekedイベントが発火しない場合のため
+        setTimeout(() => {
+          console.log(`Fallback timeout: current time = ${audioElement.currentTime}s`);
+          audioElement.removeEventListener('seeked', handleSeeked);
+          const highlighted = highlightVerse(audioElement.currentTime);
+          updateActivePage(highlighted);
+          if (audioElement.duration && isFinite(audioElement.duration)) {
+            progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
+          }
+        }, 100);
       }
     });
 
@@ -477,47 +503,73 @@ function handleProgressBarClick(e) {
   const offsetX = e.clientX - rect.left;
   const newTime = (offsetX / rect.width) * audioElement.duration;
   if (isFinite(newTime)) {
-    audioElement.currentTime = newTime;
-    console.log(`Seeked to: ${newTime.toFixed(2)}s`);
-    const highlightedVerseElement = highlightVerse(audioElement.currentTime);
-    // ハイライトが取れない（無音区間など）場合でも、時間に合うページへ即時切り替え
-    if (!highlightedVerseElement) {
-      const pagesOfMode = pages.filter(p => p.dataset.section === currentMode);
-      let targetPage = null;
-      let targetIndex = -1;
-      for (let i = 0; i < pagesOfMode.length; i++) {
-        const p = pagesOfMode[i];
-        const verses = p.querySelectorAll('.verse');
-        if (verses.length === 0) continue;
-        const firstStart = parseFloat(verses[0].dataset.start);
-        const lastEnd = parseFloat(verses[verses.length - 1].dataset.end);
-        if (!isNaN(firstStart) && !isNaN(lastEnd) && audioElement.currentTime >= firstStart && audioElement.currentTime < lastEnd) {
-          targetPage = p;
-          targetIndex = i;
-          break;
-        }
-      }
-      if (targetPage) {
-        pages.forEach(p => {
-          if (p === targetPage) {
-            if (!p.classList.contains('active')) {
-              p.style.display = 'flex';
-              p.classList.add('active');
-            }
-            currentActivePage = p;
-          } else {
-            p.style.display = 'none';
-            p.classList.remove('active');
+    console.log(`Progress bar clicked: seeking to ${newTime.toFixed(2)}s`);
+    // 再生状態を記録
+    const wasPlaying = !audioElement.paused;
+    console.log(`Was playing: ${wasPlaying}`);
+
+    // seekedイベントリスナーを一度だけ実行するために設定
+    const onSeeked = () => {
+      audioElement.removeEventListener('seeked', onSeeked);
+      console.log(`Progress bar seeked to: ${audioElement.currentTime.toFixed(2)}s`);
+
+      const highlightedVerseElement = highlightVerse(audioElement.currentTime);
+      // ハイライトが取れない（無音区間など）場合でも、時間に合うページへ即時切り替え
+      if (!highlightedVerseElement) {
+        const pagesOfMode = pages.filter(p => p.dataset.section === currentMode);
+        let targetPage = null;
+        let targetIndex = -1;
+        for (let i = 0; i < pagesOfMode.length; i++) {
+          const p = pagesOfMode[i];
+          const verses = p.querySelectorAll('.verse');
+          if (verses.length === 0) continue;
+          const firstStart = parseFloat(verses[0].dataset.start);
+          const lastEnd = parseFloat(verses[verses.length - 1].dataset.end);
+          if (!isNaN(firstStart) && !isNaN(lastEnd) && audioElement.currentTime >= firstStart && audioElement.currentTime < lastEnd) {
+            targetPage = p;
+            targetIndex = i;
+            break;
           }
-        });
-        if (targetIndex >= 0) {
-          showImage(targetIndex);
         }
+        if (targetPage) {
+          pages.forEach(p => {
+            if (p === targetPage) {
+              if (!p.classList.contains('active')) {
+                p.style.display = 'flex';
+                p.classList.add('active');
+              }
+              currentActivePage = p;
+            } else {
+              p.style.display = 'none';
+              p.classList.remove('active');
+            }
+          });
+          if (targetIndex >= 0) {
+            showImage(targetIndex);
+          }
+        }
+      } else {
+        updateActivePage(highlightedVerseElement);
       }
-    } else {
-      updateActivePage(highlightedVerseElement);
-    }
-    progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
+      progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
+
+      // 再生状態を復元
+      if (wasPlaying) {
+        console.log('Resuming playback from progress bar click');
+        audioElement.play();
+      }
+    };
+
+    audioElement.addEventListener('seeked', onSeeked);
+    audioElement.currentTime = newTime;
+
+    // フォールバック: seekedイベントが発火しない場合に備えて
+    setTimeout(() => {
+      if (audioElement.currentTime !== newTime) {
+        audioElement.removeEventListener('seeked', onSeeked);
+        onSeeked();
+      }
+    }, 100);
   } else {
     console.warn("Cannot seek: Calculated time is not finite.", newTime);
   }
