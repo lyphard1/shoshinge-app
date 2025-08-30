@@ -17,33 +17,12 @@ const modeButtons = {
   shoshinge: document.getElementById('btn-shoshinge'),
   wasan: document.getElementById('btn-wasan')
 };
-// タイミング補正UI
-const offsetMinusBtn = document.getElementById('offsetMinusBtn');
-const offsetPlusBtn = document.getElementById('offsetPlusBtn');
-const offsetResetBtn = document.getElementById('offsetResetBtn');
-const offsetValueEl = document.getElementById('offsetValue');
 
 // グローバル変数
 let currentMode = 'shoshinge';
 let pages = [];
 let currentActivePage = null;
 let currentImageIndex = -1;
-// モード別のハイライト補正（秒）。音声に対して + はハイライトを遅らせる。
-const highlightOffset = {
-  shoshinge: 0,
-  wasan: 0
-};
-const OFFSET_STEP = 0.1; // 秒
-function getEffectiveTime(t) {
-  // 現在モードの補正を適用した時間を返す（ハイライト・ページ計算用）
-  const off = highlightOffset[currentMode] || 0;
-  const eff = t - off;
-  return eff < 0 ? 0 : eff;
-}
-function updateOffsetDisplay() {
-  const v = highlightOffset[currentMode] || 0;
-  offsetValueEl.textContent = `${v.toFixed(1)}s`;
-}
 
 // 画像ファイルリスト（モード別）
 const imageFiles = {
@@ -207,8 +186,7 @@ function createPageElement(pageData) {
       if (!isNaN(verseData.start)) {
         audioElement.currentTime = verseData.start;
         // 停止中は自動再生しない。UIだけ即時反映
-        // ハイライトは補正時間で再計算
-        const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
+        const highlighted = highlightVerse(audioElement.currentTime);
         updateActivePage(highlighted);
         // 再生中/停止中に関わらず進捗バーを即時更新（timeupdate待ちでズレないように）
         if (audioElement.duration && isFinite(audioElement.duration)) {
@@ -239,28 +217,6 @@ function initialize() {
   audioElement.addEventListener('ended', handleAudioEnded);
   audioElement.addEventListener('error', handleAudioError);
   progressBarContainer.addEventListener('click', handleProgressBarClick);
-  // 補正ボタン
-  if (offsetMinusBtn && offsetPlusBtn && offsetResetBtn && offsetValueEl) {
-    offsetMinusBtn.addEventListener('click', () => {
-      highlightOffset[currentMode] = parseFloat((highlightOffset[currentMode] - OFFSET_STEP).toFixed(2));
-      updateOffsetDisplay();
-      const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
-      updateActivePage(highlighted);
-    });
-    offsetPlusBtn.addEventListener('click', () => {
-      highlightOffset[currentMode] = parseFloat((highlightOffset[currentMode] + OFFSET_STEP).toFixed(2));
-      updateOffsetDisplay();
-      const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
-      updateActivePage(highlighted);
-    });
-    offsetResetBtn.addEventListener('click', () => {
-      highlightOffset[currentMode] = 0;
-      updateOffsetDisplay();
-      const highlighted = highlightVerse(getEffectiveTime(audioElement.currentTime));
-      updateActivePage(highlighted);
-    });
-    updateOffsetDisplay();
-  }
   playBtn.disabled = false;
   pauseBtn.disabled = true;
   showImage(0);
@@ -302,8 +258,7 @@ function switchMode(mode, isInitialLoad = false) {
   } else {
     console.warn("No pages found for mode:", mode);
   }
-  updateOffsetDisplay();
-  highlightVerse(getEffectiveTime(0));
+  highlightVerse(0);
   updateActivePage(null);
   showImage(0);
 }
@@ -334,7 +289,6 @@ function showImage(index) {
 
 // ハイライト関数
 function highlightVerse(currentTime) {
-  // currentTime は補正済みの時間を渡す想定
   let highlightedVerseElement = null;
   let overallVerseIndex = -1;
   let currentPageIndex = -1;
@@ -461,7 +415,7 @@ function handleTimeUpdate() {
   if (audioElement.duration) {
     progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
   }
-  const highlightedVerseElement = highlightVerse(getEffectiveTime(audioElement.currentTime));
+  const highlightedVerseElement = highlightVerse(audioElement.currentTime);
   updateActivePage(highlightedVerseElement);
 }
 
@@ -525,8 +479,7 @@ function handleProgressBarClick(e) {
   if (isFinite(newTime)) {
     audioElement.currentTime = newTime;
     console.log(`Seeked to: ${newTime.toFixed(2)}s`);
-    const effTime = getEffectiveTime(audioElement.currentTime);
-    const highlightedVerseElement = highlightVerse(effTime);
+    const highlightedVerseElement = highlightVerse(audioElement.currentTime);
     // ハイライトが取れない（無音区間など）場合でも、時間に合うページへ即時切り替え
     if (!highlightedVerseElement) {
       const pagesOfMode = pages.filter(p => p.dataset.section === currentMode);
@@ -538,7 +491,7 @@ function handleProgressBarClick(e) {
         if (verses.length === 0) continue;
         const firstStart = parseFloat(verses[0].dataset.start);
         const lastEnd = parseFloat(verses[verses.length - 1].dataset.end);
-        if (!isNaN(firstStart) && !isNaN(lastEnd) && effTime >= firstStart && effTime < lastEnd) {
+        if (!isNaN(firstStart) && !isNaN(lastEnd) && audioElement.currentTime >= firstStart && audioElement.currentTime < lastEnd) {
           targetPage = p;
           targetIndex = i;
           break;
