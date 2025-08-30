@@ -188,8 +188,13 @@ function createPageElement(pageData) {
         const wasPlaying = !audioElement.paused;
         console.log(`Was playing: ${wasPlaying}`);
         
+        let seekCompleted = false;
+
         // seekedイベントでシーク完了後にUIを更新
         const handleSeeked = () => {
+          if (seekCompleted) return; // 重複実行を防止
+          seekCompleted = true;
+          
           console.log(`Seeked event fired: current time = ${audioElement.currentTime}s`);
           const highlighted = highlightVerse(audioElement.currentTime);
           updateActivePage(highlighted);
@@ -198,7 +203,7 @@ function createPageElement(pageData) {
             progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
           }
           // 再生中だった場合は再生を継続
-          if (wasPlaying && audioElement.paused) {
+          if (wasPlaying) {
             console.log('Resuming playback');
             audioElement.play();
           }
@@ -210,12 +215,20 @@ function createPageElement(pageData) {
 
         // フォールバック: seekedイベントが発火しない場合のため
         setTimeout(() => {
+          if (seekCompleted) return; // すでに処理済みの場合はスキップ
+          seekCompleted = true;
+          
           console.log(`Fallback timeout: current time = ${audioElement.currentTime}s`);
           audioElement.removeEventListener('seeked', handleSeeked);
           const highlighted = highlightVerse(audioElement.currentTime);
           updateActivePage(highlighted);
           if (audioElement.duration && isFinite(audioElement.duration)) {
             progressBar.style.width = (audioElement.currentTime / audioElement.duration) * 100 + '%';
+          }
+          // 再生中だった場合は再生を継続
+          if (wasPlaying) {
+            console.log('Resuming playback (fallback)');
+            audioElement.play();
           }
         }, 100);
       }
@@ -507,9 +520,14 @@ function handleProgressBarClick(e) {
     // 再生状態を記録
     const wasPlaying = !audioElement.paused;
     console.log(`Was playing: ${wasPlaying}`);
+    
+    let seekCompleted = false;
 
     // seekedイベントリスナーを一度だけ実行するために設定
     const onSeeked = () => {
+      if (seekCompleted) return; // 重複実行を防止
+      seekCompleted = true;
+      
       audioElement.removeEventListener('seeked', onSeeked);
       console.log(`Progress bar seeked to: ${audioElement.currentTime.toFixed(2)}s`);
 
@@ -565,10 +583,12 @@ function handleProgressBarClick(e) {
 
     // フォールバック: seekedイベントが発火しない場合に備えて
     setTimeout(() => {
-      if (audioElement.currentTime !== newTime) {
-        audioElement.removeEventListener('seeked', onSeeked);
-        onSeeked();
-      }
+      if (seekCompleted) return; // すでに処理済みの場合はスキップ
+      seekCompleted = true;
+      
+      console.log(`Progress bar fallback timeout: current time = ${audioElement.currentTime.toFixed(2)}s`);
+      audioElement.removeEventListener('seeked', onSeeked);
+      onSeeked();
     }, 100);
   } else {
     console.warn("Cannot seek: Calculated time is not finite.", newTime);
