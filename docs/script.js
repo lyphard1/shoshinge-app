@@ -214,6 +214,11 @@ function createPageElement(pageData) {
           // 常にその句の最初から再生を開始
           console.log('Starting playback from verse beginning');
           audioElement.play().then(() => {
+            // ボタン状態を更新
+            playBtn.disabled = true;
+            pauseBtn.disabled = false;
+            playBtn.classList.remove('active');
+            pauseBtn.classList.add('active');
             console.log('Playback started successfully');
             // 再生開始後に正しいハイライトを確認
             setTimeout(() => {
@@ -326,6 +331,8 @@ function switchMode(mode, isInitialLoad = false) {
     progressBar.style.width = '0%';
     playBtn.disabled = false;
     pauseBtn.disabled = true;
+    playBtn.classList.add('active');
+    pauseBtn.classList.remove('active');
     console.log(`Audio source set to: ${newAudioSrc}`);
   }
   const firstPageOfMode = pages.find(p => p.dataset.section === mode);
@@ -467,8 +474,8 @@ function playAudio() {
     playPromise.then(_ => {
       playBtn.disabled = true;
       pauseBtn.disabled = false;
-      playBtn.classList.add('active');
-      pauseBtn.classList.remove('active');
+      playBtn.classList.remove('active');
+      pauseBtn.classList.add('active');
       console.log("Audio playback started.");
     }).catch(error => {
       console.error("Audio playback failed:", error);
@@ -479,8 +486,8 @@ function playAudio() {
   } else {
     playBtn.disabled = true;
     pauseBtn.disabled = false;
-    playBtn.classList.add('active');
-    pauseBtn.classList.remove('active');
+    playBtn.classList.remove('active');
+    pauseBtn.classList.add('active');
   }
 }
 
@@ -489,8 +496,8 @@ function pauseAudio() {
   audioElement.pause();
   playBtn.disabled = false;
   pauseBtn.disabled = true;
-  playBtn.classList.remove('active');
-  pauseBtn.classList.add('active');
+  playBtn.classList.add('active');
+  pauseBtn.classList.remove('active');
   console.log("Audio playback paused.");
 }
 
@@ -509,7 +516,7 @@ function handleLoadedMetadata() {
   progressBar.style.width = '0%';
   playBtn.disabled = false;
   pauseBtn.disabled = true;
-  playBtn.classList.remove('active');
+  playBtn.classList.add('active');
   pauseBtn.classList.remove('active');
 }
 
@@ -518,8 +525,8 @@ function handleAudioEnded() {
   console.log("Audio ended.");
   playBtn.disabled = false;
   pauseBtn.disabled = true;
-  playBtn.classList.remove('active');
-  pauseBtn.classList.add('active');
+  playBtn.classList.add('active');
+  pauseBtn.classList.remove('active');
 }
 
 // エラーハンドラー（強化）
